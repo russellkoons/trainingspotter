@@ -1,2 +1,9 @@
 language: node_js
 node_js: node
+deploy:
+  provider: heroku
+  api_key:
+    secure: i23JtFLqiSaZulds9jtEcn2KB3JWQhrenXLaCIW9tqYvWvvGAXtq0V+IdP1TPz44wC19jtMj2F4eLFirvuEAYFP98XoOcUBZOe+bzCzw9/rOk8y7qtp5Up9HHyNeVYIZRZCMu0K4O+jPiH6CQut4gd/i+Gu2mMJ7YtEGc4TUJFKh3GJee7qC903lnsOYjGW+gVLV0NmnFecMUp7nPx6Ou2Y5yUu5qQqFL+bflYgVut1fEaOMTR2BvMzpwt/5UUh1yYzF6il69UCKAWi/8guFgRqFW0j8RzHmeagOpRkBhGjYhdgqCTtDam5cGxVHlOLTffxFjVm/GLmipLhST9kE5pRenoEiETJ6uwZy1gb+RhkFmZw+5uYnF2o/8muPKBqaCoFLr5QusUNyUwy4RS6yZu2IbJtzKhtz7xkWIVS6lcqBKjwmvtTnQe17K/nqyUNX56HqE+vR53vZDQG7PHe8k9BeQfEp/Ffxjo3mvBnDQh2OLMtftshiVY9cyOO0myn5sDR8RIx7g0a8sr3O7K/c/XJfJYIPJAioXwueKRjfpUQdeEbkxK7EOFzR5S8wJF7Rw6Vny4o0MweeTn19pCAy1RBEPKFP9nRCP4tx5Aos+7ZOhxquhCwHi8MdErKUD/bTrKxbdVw0BXAYJSgIoSU/8mD0m+wxhnlPqQ0BzHiSVCU=
+  app: spotter-node
+  on:
+    repo: russellkoons/spotter
