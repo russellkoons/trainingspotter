@@ -1,0 +1,28 @@
+{
+  "name": "spotter",
+  "version": "1.0.0",
+  "description": "An app to help log weightlifting workouts and routines",
+  "main": "server.js",
+  "dependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.2.0",
+    "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "mocha": "^5.2.0"
+  },
+  "scripts": {
+    "test": "mocha",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/russellkoons/spotter.git"
+  },
+  "author": "Russell Koons",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/russellkoons/spotter/issues"
+  },
+  "homepage": "https://github.com/russellkoons/spotter#readme"
+}
