@@ -1,5 +1,5 @@
 {
-  "name": "spotter",
+  "name": "trainingspotter",
   "version": "1.0.0",
   "description": "An app to help log weightlifting workouts and routines",
   "main": "server.js",
@@ -17,12 +17,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/russellkoons/spotter.git"
+    "url": "git+https://github.com/russellkoons/trainingspotter.git"
   },
   "author": "Russell Koons",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/russellkoons/spotter/issues"
+    "url": "https://github.com/russellkoons/trainingspotter/issues"
   },
-  "homepage": "https://github.com/russellkoons/spotter#readme"
+  "homepage": "https://github.com/russellkoons/trainingspotter#readme"
 }
