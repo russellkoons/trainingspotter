@@ -206,4 +206,23 @@ describe('trainingspotter API', function() {
     });
   });
 
+  describe('DELETE endpoint', function() {
+    it('delete log by id', function() {
+      let log;
+      return Log
+        .findOne()
+        .then(function(_log) {
+          log = _log;
+          return chai.request(app).delete(`/logs/${log.id}`);
+        })
+        .then(function(res) {
+          expect(res).to.have.status(204);
+          return Log.findById(log.id);
+        })
+        .then(function(_log) {
+          expect(_log).to.be.null;
+        });
+    });
+  });
+
 });

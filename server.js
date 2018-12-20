@@ -3,6 +3,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
+mongoose.set('useFindAndModify', false);
 mongoose.Promise = global.Promise;
 
 const { DATABASE_URL, PORT } = require('./config');
@@ -41,7 +42,6 @@ app.get('/logs/:id', (req, res) => {
 });
 
 app.post('/logs', (req, res) => {
-
   const requiredFields = ['routine', 'lifts'];
   for (let i = 0; i < requiredFields.length; i++) {
     const field = requiredFields[i];
@@ -49,9 +49,8 @@ app.post('/logs', (req, res) => {
       const message = `Missing ${field} in request body`;
       console.error(message);
       return res.status(400).send(message);
-    }
-  }
-
+    };
+  };
   Log
     .create({
       routine: req.body.routine,
@@ -64,8 +63,20 @@ app.post('/logs', (req, res) => {
       console.error(err);
       res.status(500).json({ error: 'uh oh' });
     });
-
 });
+
+app.delete('/logs/:id', (req, res) => {
+  Log
+    .findByIdAndRemove(req.params.id)
+    .then(() => {
+      console.log(`Deleting log ${req.params.id}`);
+      res.status(204).json({ message: 'Success'});
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: 'Delete failed' });
+    });
+})
 
 let server;
 
