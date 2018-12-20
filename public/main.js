@@ -2,8 +2,8 @@
 
 // Stuff I need to do:
   // 1. Figure out the date thing
-  // 2. New routine submit function
-  // 3. 
+
+let lift = 0;
 
 const MOCK_WORKOUTS = {
   "workouts": [
@@ -42,7 +42,7 @@ const MOCK_WORKOUTS = {
         }
       ],
       "notes": "Yeah yeah yeahhhhhh",
-      "date": "December 21, 2018"
+      "date": "Wed Dec 19 2018"
     },
     {
       "id": 22222,
@@ -79,7 +79,7 @@ const MOCK_WORKOUTS = {
         }
       ],
       "notes": "I goofed",
-      "date": "December 19, 2018"
+      "date": "Mon Dec 17 2018"
     },
     {
       "id": 33333,
@@ -116,7 +116,7 @@ const MOCK_WORKOUTS = {
         }
       ],
       "notes": "A good workout" ,
-      "date": "December 17, 2018"
+      "date": "Fri Dec 14 2018"
     }
   ]
 }
@@ -147,6 +147,34 @@ function displayWorkouts(data) {
   }
 }
 
+function addRoutine(lift) {
+  const date = Date();
+  console.log(date);
+  const newLog = {
+    "id": 44444,
+    "routine": $('#routine').val(),
+    "user": "Russell Koons",
+    "lifts": [
+
+    ],
+    "notes": $('#notes').val(),
+    "date": Date()
+  };
+  for (let i = 0; i <= lift; i++) {
+    newLog.lifts.push({
+      "name": $(`#name-${i}`).val(),
+      "weight": $(`#weight-${i}`).val(),
+      "unit": $(`#unit-${i}`).val(),
+      "sets": $(`#set-${i}`).val(),
+      "reps": $(`#rep-${i}`).val()
+    });
+  };
+  MOCK_WORKOUTS.workouts.unshift(newLog);
+  $('#log-form').empty();
+  getWorkouts();
+  console.log('addRoutine working');
+}
+
 function addWorkout() {
   const newLog = {
     "id": 44444,
@@ -156,7 +184,7 @@ function addWorkout() {
 
     ],
     "notes": $('#notes').val(),
-    "date": Date.now()
+    "date": Date()
   };
   const found = MOCK_WORKOUTS.workouts.find(function(workout) {
     return workout.routine === $('#routine-list').val();
@@ -164,10 +192,10 @@ function addWorkout() {
   for (let i = 0; i < found.lifts.length; i++) {
     newLog.lifts.push({
       "name": found.lifts[i].name,
-      "weight": $(`#weight${i}`).val(),
-      "unit": $(`#unit${i}`).val(),
-      "sets": $(`#set${i}`).val(),
-      "reps": $(`#rep${i}`).val()
+      "weight": $(`#weight-${i}`).val(),
+      "unit": $(`#unit-${i}`).val(),
+      "sets": $(`#set-${i}`).val(),
+      "reps": $(`#rep-${i}`).val()
     });
   }
   MOCK_WORKOUTS.workouts.unshift(newLog);
@@ -189,8 +217,8 @@ function createForm() {
       <span>${found.lifts[i].name}</span><br/>
         <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" id="weight-${i}" value="${found.lifts[i].weight}" required>
         <select id="unit-${i}">
-          <option value="lbs">lbs</option>
           <option value="kgs">kgs</option>
+          <option value="lbs">lbs</option>
         </select>
         <label for="set-${i}">Sets: </label><input type="number" name="set-${i}" id="set-${i}" value="${found.lifts[i].sets}" required>
         <label for="rep-${i}">Reps: </label><input type="number" name="rep-${i}" id="rep-${i}" value="${found.lifts[i].reps}" required><br/>
@@ -205,13 +233,16 @@ function createForm() {
 }
 
 function addLift() {
-  let lift = 0;
   $('#log-form').on('click', '#js-add-lift', function() {
     lift++;
     console.log(lift);
     $('#new-routine-lifts').append(`
       <label for="name-${lift}">Lift name: <input type="text" name="name-${lift}" id="name-${lift}" required>
-      <label for="weight-${lift}">Weight: <input type="number" name="weight-${lift}" id="weight-${lift} required>
+      <label for="weight-${lift}">Weight: <input type="number" name="weight-${lift}" id="weight-${lift}" required>
+      <select id="unit-${lift}">
+      <option value="kgs">kgs</option>
+      <option value="lbs">lbs</option>
+      </select>
       <label for="set-${lift}">Sets: <input type="number" name="set-${lift}" id="set-${lift}" required>
       <label for="rep-${lift}">Reps: <input type="number" name="rep-${lift}" id="rep-${lift}" required><br/>
     `);
@@ -224,11 +255,15 @@ function newRoutine() {
     $('#log-form').removeClass('hidden');
     $('#log-form').empty();
     $('#log-form').append(`
-      <form id="new-routine" onsubmit="event.preventDefault(); addRoutine();">
+      <form id="new-routine" onsubmit="event.preventDefault(); addRoutine(lift);">
         <section id="new-routine-lifts">
           <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine" required><br/>
           <label for="name-0">Lift name: <input type="text" name="name-0" id="name-0" required>
-          <label for="weight-0">Weight: <input type="number" name="weight-0" id="weight-0 required>
+          <label for="weight-0">Weight: <input type="number" name="weight-0" id="weight-0" required>
+          <select id="unit-0">
+            <option value="kgs">kgs</option>
+            <option value="lbs">lbs</option>
+          </select>
           <label for="set-0">Sets: <input type="number" name="set-0" id="set-0" required>
           <label for="rep-0">Reps: <input type="number" name="rep-0" id="rep-0" required><br/>
         </section>
