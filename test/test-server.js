@@ -50,8 +50,7 @@ function generateLogs() {
         reps: faker.random.number()
       }
     ],
-    notes: faker.lorem.words(),
-    date: faker.date.recent()
+    notes: faker.lorem.words()
   }
 }
 
@@ -130,7 +129,79 @@ describe('trainingspotter API', function() {
           expect(resLog.lifts[0].weight).to.equal(log.lifts[0].weight);
           expect(resLog.lifts[0].sets).to.equal(log.lifts[0].sets);
           expect(resLog.lifts[0].reps).to.equal(log.lifts[0].reps);
+          expect(resLog.lifts[1].name).to.equal(log.lifts[1].name);
+          expect(resLog.lifts[1].weight).to.equal(log.lifts[1].weight);
+          expect(resLog.lifts[1].sets).to.equal(log.lifts[1].sets);
+          expect(resLog.lifts[1].reps).to.equal(log.lifts[1].reps);
+          expect(resLog.lifts[2].name).to.equal(log.lifts[2].name);
+          expect(resLog.lifts[2].weight).to.equal(log.lifts[2].weight);
+          expect(resLog.lifts[2].sets).to.equal(log.lifts[2].sets);
+          expect(resLog.lifts[2].reps).to.equal(log.lifts[2].reps);
+          expect(resLog.lifts[3].name).to.equal(log.lifts[3].name);
+          expect(resLog.lifts[3].weight).to.equal(log.lifts[3].weight);
+          expect(resLog.lifts[3].sets).to.equal(log.lifts[3].sets);
+          expect(resLog.lifts[3].reps).to.equal(log.lifts[3].reps);
           expect(resLog.notes).to.equal(log.notes);
+        });
+    });
+  });
+
+  describe('POST endpoint', function() {
+    it('should make a new log', function() {
+      const newLog = generateLogs();
+      return chai.request(app)
+        .post('/logs')
+        .send(newLog)
+        .then(function(res) {
+          expect(res).to.have.status(201);
+          expect(res).to.be.json;
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.include.keys(
+            'id', 'routine', 'user', 'lifts', 'notes', 'date'
+          );
+          expect(res.body.routine).to.equal(newLog.routine);
+          expect(res.body.id).to.not.be.null;
+          expect(res.body.user).to.equal(newLog.user);
+          expect(res.body.lifts[0].name).to.equal(newLog.lifts[0].name);
+          expect(res.body.lifts[0].weight).to.equal(newLog.lifts[0].weight);
+          expect(res.body.lifts[0].sets).to.equal(newLog.lifts[0].sets);
+          expect(res.body.lifts[0].reps).to.equal(newLog.lifts[0].reps);
+          expect(res.body.lifts[1].name).to.equal(newLog.lifts[1].name);
+          expect(res.body.lifts[1].weight).to.equal(newLog.lifts[1].weight);
+          expect(res.body.lifts[1].sets).to.equal(newLog.lifts[1].sets);
+          expect(res.body.lifts[1].reps).to.equal(newLog.lifts[1].reps);
+          expect(res.body.lifts[2].name).to.equal(newLog.lifts[2].name);
+          expect(res.body.lifts[2].weight).to.equal(newLog.lifts[2].weight);
+          expect(res.body.lifts[2].sets).to.equal(newLog.lifts[2].sets);
+          expect(res.body.lifts[2].reps).to.equal(newLog.lifts[2].reps);
+          expect(res.body.lifts[3].name).to.equal(newLog.lifts[3].name);
+          expect(res.body.lifts[3].weight).to.equal(newLog.lifts[3].weight);
+          expect(res.body.lifts[3].sets).to.equal(newLog.lifts[3].sets);
+          expect(res.body.lifts[3].reps).to.equal(newLog.lifts[3].reps);
+          expect(res.body.notes).to.equal(newLog.notes);
+          expect(res.body.date).to.not.be.null;
+          return Log.findById(res.body.id);
+        })
+        .then(function(log) {
+          expect(log.routine).to.equal(newLog.routine);
+          expect(log.user).to.equal(newLog.user);
+          expect(log.lifts[0].name).to.equal(newLog.lifts[0].name);
+          expect(log.lifts[0].weight).to.equal(newLog.lifts[0].weight);
+          expect(log.lifts[0].sets).to.equal(newLog.lifts[0].sets);
+          expect(log.lifts[0].reps).to.equal(newLog.lifts[0].reps);
+          expect(log.lifts[1].name).to.equal(newLog.lifts[1].name);
+          expect(log.lifts[1].weight).to.equal(newLog.lifts[1].weight);
+          expect(log.lifts[1].sets).to.equal(newLog.lifts[1].sets);
+          expect(log.lifts[1].reps).to.equal(newLog.lifts[1].reps);
+          expect(log.lifts[2].name).to.equal(newLog.lifts[2].name);
+          expect(log.lifts[2].weight).to.equal(newLog.lifts[2].weight);
+          expect(log.lifts[2].sets).to.equal(newLog.lifts[2].sets);
+          expect(log.lifts[2].reps).to.equal(newLog.lifts[2].reps);
+          expect(log.lifts[3].name).to.equal(newLog.lifts[3].name);
+          expect(log.lifts[3].weight).to.equal(newLog.lifts[3].weight);
+          expect(log.lifts[3].sets).to.equal(newLog.lifts[3].sets);
+          expect(log.lifts[3].reps).to.equal(newLog.lifts[3].reps);
+          expect(log.notes).to.equal(newLog.notes);
         });
     });
   });
