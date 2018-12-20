@@ -97,7 +97,7 @@ app.delete('/logs/:id', (req, res) => {
     .findByIdAndRemove(req.params.id)
     .then(() => {
       console.log(`Deleting log ${req.params.id}`);
-      res.status(204).json({ message: 'Success'});
+      res.status(204).json({ message: 'Successful delete'});
     })
     .catch(err => {
       console.log(err);

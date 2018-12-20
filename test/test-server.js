@@ -12,7 +12,7 @@ const {TEST_DATABASE_URL} = require('../config');
 chai.use(chaiHttp);
 
 function seedLogs() {
-  console.info('seeding logs to test server');
+  console.info('Seeding logs to test server');
   const seedLogs = [];
   for (let i = 0; i <= 5; i++) {
     seedLogs.push(generateLogs());
@@ -202,6 +202,40 @@ describe('trainingspotter API', function() {
           expect(log.lifts[3].sets).to.equal(newLog.lifts[3].sets);
           expect(log.lifts[3].reps).to.equal(newLog.lifts[3].reps);
           expect(log.notes).to.equal(newLog.notes);
+        });
+    });
+  });
+
+  describe('PUT endpoint', function() {
+    it('should update fields you send', function() {
+      const updateData = {
+        routine: 'A',
+        lifts: [{
+          name: 'Squat',
+          weight: 225,
+          sets: 5,
+          reps: 5
+        }],
+        notes: 'New update fam'
+      };
+      return Log
+        .findOne()
+        .then(function(log) {
+          updateData.id = log.id;
+          return chai.request(app)
+            .put(`/logs/${log.id}`)
+            .send(updateData);
+        })
+        .then(function(res) {
+          expect(res).to.have.status(204);
+          return Log.findById(updateData.id);
+        })
+        .then(function(log) {
+          expect(log.routine).to.equal(updateData.routine);
+          expect(log.lifts[0].name).to.equal(updateData.lifts[0].name);
+          expect(log.lifts[0].weight).to.equal(updateData.lifts[0].weight);
+          expect(log.lifts[0].sets).to.equal(updateData.lifts[0].sets);
+          expect(log.lifts[0].reps).to.equal(updateData.lifts[0].reps);
         });
     });
   });
