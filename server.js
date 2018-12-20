@@ -30,6 +30,16 @@ app.get('/logs', (req, res) => {
     });
 });
 
+app.get('/logs/:id', (req, res) => {
+  Log
+    .findById(req.params.id)
+    .then(log => res.json(log.serialize()))
+    .catch(err => {
+      console.error(err);
+      res.status(500).json({ error: 'Dang it!' });
+    });
+});
+
 app.post('/logs', (req, res) => {
 
   const requiredFields = ['routine', 'lifts'];
