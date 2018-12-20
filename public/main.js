@@ -1,5 +1,10 @@
 'use strict';
 
+// Stuff I need to do:
+  // 1. Figure out the date thing
+  // 2. New routine submit function
+  // 3. 
+
 const MOCK_WORKOUTS = {
   "workouts": [
     {
@@ -182,13 +187,13 @@ function createForm() {
     for (let i = 0; i < found.lifts.length; i++) {
       $('#new-workout').append(`
       <span>${found.lifts[i].name}</span><br/>
-        <label for="weight${i}">Weight: </label><input type="number" name="weight${i}" id="weight${i}" value="${found.lifts[i].weight}" required>
-        <select id="unit${i}">
+        <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" id="weight-${i}" value="${found.lifts[i].weight}" required>
+        <select id="unit-${i}">
           <option value="lbs">lbs</option>
           <option value="kgs">kgs</option>
         </select>
-        <label for="set${i}">Sets: </label><input type="number" name="set${i}" id="set${i}" value="${found.lifts[i].sets}" required>
-        <label for="rep${i}">Reps: </label><input type="number" name="rep${i}" id="rep${i}" value="${found.lifts[i].reps}" required><br/>
+        <label for="set-${i}">Sets: </label><input type="number" name="set-${i}" id="set-${i}" value="${found.lifts[i].sets}" required>
+        <label for="rep-${i}">Reps: </label><input type="number" name="rep-${i}" id="rep-${i}" value="${found.lifts[i].reps}" required><br/>
       `);
     };
     $('#new-workout').append(`
@@ -199,17 +204,63 @@ function createForm() {
   })
 }
 
+function addLift() {
+  let lift = 0;
+  $('#log-form').on('click', '#js-add-lift', function() {
+    lift++;
+    console.log(lift);
+    $('#new-routine-lifts').append(`
+      <label for="name-${lift}">Lift name: <input type="text" name="name-${lift}" id="name-${lift}" required>
+      <label for="weight-${lift}">Weight: <input type="number" name="weight-${lift}" id="weight-${lift} required>
+      <label for="set-${lift}">Sets: <input type="number" name="set-${lift}" id="set-${lift}" required>
+      <label for="rep-${lift}">Reps: <input type="number" name="rep-${lift}" id="rep-${lift}" required><br/>
+    `);
+    console.log('addLift working');
+  });
+}
+
+function newRoutine() {
+  $('#js-new-routine').click(event => {
+    $('#log-form').removeClass('hidden');
+    $('#log-form').empty();
+    $('#log-form').append(`
+      <form id="new-routine" onsubmit="event.preventDefault(); addRoutine();">
+        <section id="new-routine-lifts">
+          <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine" required><br/>
+          <label for="name-0">Lift name: <input type="text" name="name-0" id="name-0" required>
+          <label for="weight-0">Weight: <input type="number" name="weight-0" id="weight-0 required>
+          <label for="set-0">Sets: <input type="number" name="set-0" id="set-0" required>
+          <label for="rep-0">Reps: <input type="number" name="rep-0" id="rep-0" required><br/>
+        </section>
+        <section id="notes-n-submit">
+          <label for="notes">Notes: </label><input type="text" name="notes" id="notes"><br/>
+          <input type="submit" value="Submit" id="js-routine-submit">
+        </section>
+      </form>
+      <button type="button" id="js-add-lift">Add another lift</button>
+    `);
+    console.log('newRoutine working');
+  });
+}
+
 function newWorkout() {
   $('#js-new-log').click(event => {
     $('#log-form').removeClass('hidden');
     $('#log-form').empty();
+    let routines = [];
+    for (let i = 0; i < MOCK_WORKOUTS.workouts.length; i++) {
+      routines.push(MOCK_WORKOUTS.workouts[i].routine);
+    }
+    let list = [...new Set(routines)];
     $('#log-form').append(
       `Choose a routine: <select id="routine-list">
-        <option value="A">A</option>
-        <option value="B">B</option>
+
       </select>
       <button type="button" id="js-choose-routine">Submit</button>`
-    )
+    );
+    for (let i = 0; i < list.length; i++) {
+      $('#routine-list').append(`<option value="${list[i]}">${list[i]}</option>`);
+    };
     createForm();
     console.log('newWorkout working');
   })
@@ -222,4 +273,6 @@ function getWorkouts() {
 $(function() {
   getWorkouts();
   newWorkout();
+  newRoutine();
+  addLift();
 })
