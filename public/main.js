@@ -5,6 +5,7 @@
 
 let lift = 0;
 
+
 const MOCK_WORKOUTS = {
   "workouts": [
     {
