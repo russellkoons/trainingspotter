@@ -1,7 +1,6 @@
 'use strict';
 
 const express = require('express');
-const morgan = require('morgan');
 const mongoose = require('mongoose');
 mongoose.set('useFindAndModify', false);
 mongoose.Promise = global.Promise;
@@ -12,7 +11,6 @@ const { Log } = require('./models');
 const app = express();
 
 app.use(express.static('public'));
-app.use(morgan('common'));
 app.use(express.json());
 
 app.get('/', (req, res) => {
@@ -63,6 +61,35 @@ app.post('/logs', (req, res) => {
       console.error(err);
       res.status(500).json({ error: 'uh oh' });
     });
+});
+
+app.put('/logs/:id', (req, res) => {
+  if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
+    res.status(400).json({
+      error: 'Request path id and body ids must match'
+    });
+  };
+  const updated = {
+    "routine": req.body.routine,
+    "notes": req.body.notes
+  };
+  if (!(req.body.lifts === undefined)) {
+    updated.lifts = [];
+    for (let i = 0; i < req.body.lifts.length; i++) {
+      updated.lifts.push({
+        "name": req.body.lifts[i].name,
+        "weight": req.body.lifts[i].weight,
+        "sets": req.body.lifts[i].sets,
+        "reps": req.body.lifts[i].reps
+      });
+    };
+  };
+  Log
+    .findByIdAndUpdate(req.params.id, { $set: updated }, { new: true })
+    .then(updatedLog => {
+      res.status(204).end()
+    })
+    .catch(err => res.status(500).json({ message: `Failed to update log ${req.params.id}` }));
 });
 
 app.delete('/logs/:id', (req, res) => {

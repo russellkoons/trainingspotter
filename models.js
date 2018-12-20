@@ -8,7 +8,7 @@ const logSchema = mongoose.Schema({
   user: {type: String},
   lifts: {type: Array, required: true},
   notes: {type: String},
-  date: {type: Date, default: Date.now}
+  date: {type: Date, default: Date()}
 });
 
 logSchema.methods.serialize = function() {
