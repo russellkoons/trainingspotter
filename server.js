@@ -1,6 +1,10 @@
 'use strict';
 
+require('dotenv').config();
+
 const express = require('express');
+const morgan = require('morgan');
+const passport = require('passport');
 const mongoose = require('mongoose');
 mongoose.set('useFindAndModify', false);
 mongoose.Promise = global.Promise;
@@ -10,8 +14,19 @@ const { Log } = require('./models');
 
 const app = express();
 
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Origin', 'Content-Type,Authorization');
+  res.header('Access-Control-Allow-Origin', 'GET,POST,PUT,DELETE');
+  if (req.method === 'OPTIONS') {
+    return res.send(204);
+  };
+  next();
+});
+
 app.use(express.static('public'));
 app.use(express.json());
+
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
@@ -103,7 +118,11 @@ app.delete('/logs/:id', (req, res) => {
       console.log(err);
       res.status(500).json({ error: 'Delete failed' });
     });
-})
+});
+
+app.use('*', (req, res) => {
+  return res.status(404).json({ message: "Page not found" });
+});
 
 let server;
 

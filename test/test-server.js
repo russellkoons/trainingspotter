@@ -28,24 +28,28 @@ function generateLogs() {
       {
         name: faker.random.word(),
         weight: faker.random.number(),
+        unit: 'lbs',
         sets: faker.random.number(),
         reps: faker.random.number()
       },
       {
         name: faker.random.word(),
         weight: faker.random.number(),
+        unit: 'kgs',
         sets: faker.random.number(),
         reps: faker.random.number()
       },
       {
         name: faker.random.word(),
         weight: faker.random.number(),
+        unit: 'kgs',
         sets: faker.random.number(),
         reps: faker.random.number()
       },
       {
         name: faker.random.word(),
         weight: faker.random.number(),
+        unit: 'lbs',
         sets: faker.random.number(),
         reps: faker.random.number()
       }
@@ -58,6 +62,17 @@ function deleteDb() {
   console.warn('Deleting test database');
   return mongoose.connection.dropDatabase();
 }
+
+describe('Testing the server', function() {
+  it('should respond', function() {
+    return chai
+      .request(app)
+      .get('/')
+      .then(function(res) {
+        expect(res).to.have.status(200);
+      });
+  });
+})
 
 describe('trainingspotter API', function() {
 
@@ -75,15 +90,6 @@ describe('trainingspotter API', function() {
 
   after(function() {
     return closeServer();
-  });
-
-  it('should respond', function() {
-    return chai
-      .request(app)
-      .get('/')
-      .then(function(res) {
-        expect(res).to.have.status(200);
-      });
   });
 
   describe('GET endpoint', function() {
@@ -114,8 +120,20 @@ describe('trainingspotter API', function() {
           expect(res.body).to.have.lengthOf.at.least(1);
           res.body.forEach(function(log) {
             expect(log).to.be.a('object');
-            expect(log).a.include.keys(
+            expect(log).to.include.keys(
               'id', 'routine', 'user', 'lifts', 'notes', 'date'
+            );
+            expect(log.lifts[0]).to.include.keys(
+              'name', 'weight', 'unit', 'sets', 'reps'
+            );
+            expect(log.lifts[1]).to.include.keys(
+              'name', 'weight', 'unit', 'sets', 'reps'
+            );
+            expect(log.lifts[2]).to.include.keys(
+              'name', 'weight', 'unit', 'sets', 'reps'
+            );
+            expect(log.lifts[3]).to.include.keys(
+              'name', 'weight', 'unit', 'sets', 'reps'
             );
           });
           resLog = res.body[0];
@@ -127,18 +145,22 @@ describe('trainingspotter API', function() {
           expect(resLog.user).to.equal(log.user);
           expect(resLog.lifts[0].name).to.equal(log.lifts[0].name);
           expect(resLog.lifts[0].weight).to.equal(log.lifts[0].weight);
+          expect(resLog.lifts[0].unit).to.equal(log.lifts[0].unit);
           expect(resLog.lifts[0].sets).to.equal(log.lifts[0].sets);
           expect(resLog.lifts[0].reps).to.equal(log.lifts[0].reps);
           expect(resLog.lifts[1].name).to.equal(log.lifts[1].name);
           expect(resLog.lifts[1].weight).to.equal(log.lifts[1].weight);
+          expect(resLog.lifts[1].unit).to.equal(log.lifts[1].unit);
           expect(resLog.lifts[1].sets).to.equal(log.lifts[1].sets);
           expect(resLog.lifts[1].reps).to.equal(log.lifts[1].reps);
           expect(resLog.lifts[2].name).to.equal(log.lifts[2].name);
           expect(resLog.lifts[2].weight).to.equal(log.lifts[2].weight);
+          expect(resLog.lifts[1].unit).to.equal(log.lifts[2].unit);
           expect(resLog.lifts[2].sets).to.equal(log.lifts[2].sets);
           expect(resLog.lifts[2].reps).to.equal(log.lifts[2].reps);
           expect(resLog.lifts[3].name).to.equal(log.lifts[3].name);
           expect(resLog.lifts[3].weight).to.equal(log.lifts[3].weight);
+          expect(resLog.lifts[3].unit).to.equal(log.lifts[3].unit);
           expect(resLog.lifts[3].sets).to.equal(log.lifts[3].sets);
           expect(resLog.lifts[3].reps).to.equal(log.lifts[3].reps);
           expect(resLog.notes).to.equal(log.notes);
@@ -164,18 +186,22 @@ describe('trainingspotter API', function() {
           expect(res.body.user).to.equal(newLog.user);
           expect(res.body.lifts[0].name).to.equal(newLog.lifts[0].name);
           expect(res.body.lifts[0].weight).to.equal(newLog.lifts[0].weight);
+          expect(res.body.lifts[0].unit).to.equal(newLog.lifts[0].unit);
           expect(res.body.lifts[0].sets).to.equal(newLog.lifts[0].sets);
           expect(res.body.lifts[0].reps).to.equal(newLog.lifts[0].reps);
           expect(res.body.lifts[1].name).to.equal(newLog.lifts[1].name);
           expect(res.body.lifts[1].weight).to.equal(newLog.lifts[1].weight);
+          expect(res.body.lifts[1].unit).to.equal(newLog.lifts[1].unit);
           expect(res.body.lifts[1].sets).to.equal(newLog.lifts[1].sets);
           expect(res.body.lifts[1].reps).to.equal(newLog.lifts[1].reps);
           expect(res.body.lifts[2].name).to.equal(newLog.lifts[2].name);
           expect(res.body.lifts[2].weight).to.equal(newLog.lifts[2].weight);
+          expect(res.body.lifts[2].unit).to.equal(newLog.lifts[2].unit);
           expect(res.body.lifts[2].sets).to.equal(newLog.lifts[2].sets);
           expect(res.body.lifts[2].reps).to.equal(newLog.lifts[2].reps);
           expect(res.body.lifts[3].name).to.equal(newLog.lifts[3].name);
           expect(res.body.lifts[3].weight).to.equal(newLog.lifts[3].weight);
+          expect(res.body.lifts[3].unit).to.equal(newLog.lifts[3].unit);
           expect(res.body.lifts[3].sets).to.equal(newLog.lifts[3].sets);
           expect(res.body.lifts[3].reps).to.equal(newLog.lifts[3].reps);
           expect(res.body.notes).to.equal(newLog.notes);
@@ -187,18 +213,22 @@ describe('trainingspotter API', function() {
           expect(log.user).to.equal(newLog.user);
           expect(log.lifts[0].name).to.equal(newLog.lifts[0].name);
           expect(log.lifts[0].weight).to.equal(newLog.lifts[0].weight);
+          expect(log.lifts[0].unit).to.equal(newLog.lifts[0].unit);
           expect(log.lifts[0].sets).to.equal(newLog.lifts[0].sets);
           expect(log.lifts[0].reps).to.equal(newLog.lifts[0].reps);
           expect(log.lifts[1].name).to.equal(newLog.lifts[1].name);
           expect(log.lifts[1].weight).to.equal(newLog.lifts[1].weight);
+          expect(log.lifts[1].unit).to.equal(newLog.lifts[1].unit);
           expect(log.lifts[1].sets).to.equal(newLog.lifts[1].sets);
           expect(log.lifts[1].reps).to.equal(newLog.lifts[1].reps);
           expect(log.lifts[2].name).to.equal(newLog.lifts[2].name);
           expect(log.lifts[2].weight).to.equal(newLog.lifts[2].weight);
+          expect(log.lifts[2].unit).to.equal(newLog.lifts[2].unit);
           expect(log.lifts[2].sets).to.equal(newLog.lifts[2].sets);
           expect(log.lifts[2].reps).to.equal(newLog.lifts[2].reps);
           expect(log.lifts[3].name).to.equal(newLog.lifts[3].name);
           expect(log.lifts[3].weight).to.equal(newLog.lifts[3].weight);
+          expect(log.lifts[3].unit).to.equal(newLog.lifts[3].unit);
           expect(log.lifts[3].sets).to.equal(newLog.lifts[3].sets);
           expect(log.lifts[3].reps).to.equal(newLog.lifts[3].reps);
           expect(log.notes).to.equal(newLog.notes);
@@ -213,6 +243,7 @@ describe('trainingspotter API', function() {
         lifts: [{
           name: 'Squat',
           weight: 225,
+          unit: 'lbs',
           sets: 5,
           reps: 5
         }],
@@ -234,8 +265,10 @@ describe('trainingspotter API', function() {
           expect(log.routine).to.equal(updateData.routine);
           expect(log.lifts[0].name).to.equal(updateData.lifts[0].name);
           expect(log.lifts[0].weight).to.equal(updateData.lifts[0].weight);
+          expect(log.lifts[0].unit).to.equal(updateData.lifts[0].unit);
           expect(log.lifts[0].sets).to.equal(updateData.lifts[0].sets);
           expect(log.lifts[0].reps).to.equal(updateData.lifts[0].reps);
+          expect(log.notes).to.equal(updateData.notes);
         });
     });
   });

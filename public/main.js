@@ -127,6 +127,8 @@ function getRecentWorkouts(callbackFn) {
 
 function displayWorkouts(data) {
   $('#workout-list').empty();
+  $('#workout-list').removeClass('hidden');
+  $('#log-buttons').removeClass('hidden');
   for (let i = 0; i < data.workouts.length; i++) {
     $('#workout-list').append(
       '<p>' + data.workouts[i].date + '</p>' +
@@ -302,11 +304,12 @@ function newWorkout() {
 }
 
 function getWorkouts() {
+  $('#login').addClass('hidden');
+  $('#signup').addClass('hidden');
   getRecentWorkouts(displayWorkouts);
 }
 
 $(function() {
-  getWorkouts();
   newWorkout();
   newRoutine();
   addLift();

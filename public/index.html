@@ -15,15 +15,33 @@
     <section>
       <p>Log your weightlifting sessions with trainingspotter!</p>
     </section>
+    <section role="">
+      <form id="login" onsubmit="event.preventDefault(); getWorkouts();">
+        <legend>Login!</legend>
+        <label for="username">Username: </label><input type="text" name="username" id="username" required><br/>
+        <label for="password">Password: </label><input type="text" name="password" id="password" required><br/>
+        <input type="submit" value="Login" id="js-login">
+      </form>
+      <form id="signup" onsubmit="event.preventDefault(); getWorkouts();">
+        <legend>Sign Up!</legend>
+        <label for="username">Username: </label><input type="text" name="username" id="username" required><br/>
+        <label for="password">Password: </label><input type="text" name="password" id="password" required><br/>
+        <label for="passconfirm">Re-enter your password: </label><input type="text" name="passconfirm" id="passconfirm" required><br/>
+        <input type="submit" value="Join" id="js-signup">
+      </form>
+    </section>
+    <section id="log-buttons" class="hidden">
+      <button type="button" id="js-new-log">Log a new workout</button> or <button type="button" id="js-new-routine">Create a new routine</button>
+    </section>
   </header>
   <main id="main">
-    <section>
+    <section class="hidden">
       <button type="button" id="js-new-log">Log a new workout</button> or <button type="button" id="js-new-routine">Create a new routine</button>
     </section>
     <section id="log-form" class="hidden">
 
     </section>
-    <section id="workout-list">
+    <section id="workout-list" class="hidden">
 
     </section>
   </main>

@@ -6,7 +6,13 @@ mongoose.Promise = global.Promise;
 const logSchema = mongoose.Schema({
   routine: {type: String, required: true},
   user: {type: String},
-  lifts: {type: Array, required: true},
+  lifts: {
+    name: String,
+    weight: String,
+    unit: String,
+    sets: String,
+    reps: String
+  },
   notes: {type: String},
   date: {type: Date, default: Date()}
 });
