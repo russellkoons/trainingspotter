@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 
 const expect = chai.expect;
 
-const {Log} = require('../models');
+const { Log, User } = require('../models');
 const {app, runServer, closeServer} = require('../server');
 const {TEST_DATABASE_URL} = require('../config');
 
@@ -74,7 +74,7 @@ describe('Testing the server', function() {
   });
 })
 
-describe('trainingspotter API', function() {
+describe('Log Router', function() {
 
   before(function() {
     return runServer(TEST_DATABASE_URL);
@@ -292,4 +292,169 @@ describe('trainingspotter API', function() {
     });
   });
 
+});
+
+describe('User Router', function() {
+  const username = 'testUser';
+  const password = 'password';
+
+  before(function() {
+    return runServer(TEST_DATABASE_URL);
+  });
+
+  after(function() {
+    return closeServer();
+  });
+
+  beforeEach(function() { });
+
+  afterEach(function() {
+    return User.remove({});
+  });
+
+  describe('POST endpoint', function() {
+    it('Should reject users with nontrimmed username', function() {
+      return chai
+        .request(app)
+        .post('/users')
+        .send({
+          username: ` ${username} `,
+          password
+        })
+        .catch(err => {
+          if (err instanceof chai.AssertionError) {
+            throw err;
+          };
+          const res = err.response;
+          expect(res).to.have.status(422);
+          expect(res.body.reason).to.equal('ValidationError');
+          expect(res.body.message).to.equal('Username and Password cannot have whitespace');
+          expect(res.body.location).to.equal('username');
+        });
+    });
+
+    it('Should reject users with a nontrimmed password', function() {
+      return chai
+      .request(app)
+      .post('/users')
+      .send({
+        username,
+        password: ` ${password} `
+      })
+      .catch(err => {
+        if (err instanceof chai.AssertionError) {
+          throw err;
+        };
+        const res = err.response;
+        expect(res).to.have.status(422);
+        expect(res.body.reason).to.equal('ValidationError');
+        expect(res.body.message).to.equal('Username and Password cannot have whitespace');
+        expect(res.body.location).to.equal('password');
+      });
+    });
+
+    it('Should reject users with too short username', function() {
+      return chai
+      .request(app)
+      .post('/users')
+      .send({
+        username: '',
+        password
+      })
+      .catch(err => {
+        if (err instanceof chai.AssertionError) {
+          throw err;
+        };
+        const res = err.response;
+        expect(res).to.have.status(422);
+        expect(res.body.reason).to.equal('ValidationError');
+        expect(res.body.message).to.equal('Must be at least 1 characters long');
+        expect(res.body.location).to.equal('username');
+      });
+    });
+
+    it('Should reject users with too long of a username', function() {
+      return chai
+      .request(app)
+      .post('/users')
+      .send({
+        username: 'ReallyLongUsernameMcgee',
+        password
+      })
+      .catch(err => {
+        if (err instanceof chai.AssertionError) {
+          throw err;
+        };
+        const res = err.response;
+        expect(res).to.have.status(422);
+        expect(res.body.reason).to.equal('ValidationError');
+        expect(res.body.message).to.equal('Must be at most 16 characters long');
+        expect(res.body.location).to.equal('username');
+      });
+    });
+
+    it('Should reject users with too short of a password', function() {
+      return chai
+      .request(app)
+      .post('/users')
+      .send({
+        username,
+        password: 'hello'
+      })
+      .catch(err => {
+        if (err instanceof chai.AssertionError) {
+          throw err;
+        };
+        const res = err.response;
+        expect(res).to.have.status(422);
+        expect(res.body.reason).to.equal('ValidationError');
+        expect(res.body.message).to.equal('Must be at least 8 characters long');
+        expect(res.body.location).to.equal('password');
+      });
+    });
+
+    it('Should reject users with too long of a password', function() {
+      return chai
+      .request(app)
+      .post('/users')
+      .send({
+        username,
+        password: new Array(73).fill('a').join('')
+      })
+      .catch(err => {
+        if (err instanceof chai.AssertionError) {
+          throw err;
+        };
+        const res = err.response;
+        expect(res).to.have.status(422);
+        expect(res.body.reason).to.equal('ValidationError');
+        expect(res.body.message).to.equal('Must be at most 72 characters long');
+        expect(res.body.location).to.equal('password');
+      });
+    });
+
+    it('Should create a new user', function() {
+      return chai
+        .request(app)
+        .post('/users')
+        .send({
+          username,
+          password
+        })
+        .then(res => {
+          expect(res).to.have.status(201);
+          expect(res.body).to.be.a('object');
+          expect(res.body).to.have.keys('username');
+          expect(res.body.username).to.equal(username);
+          return User.findOne({username});
+        })
+        .then(user => {
+          expect(user).to.not.be.null;
+          return user.validatePassword(password);
+        })
+        .then(correct => {
+          expect(correct).to.be.true;
+        });
+    });
+  });
 });

@@ -8,13 +8,7 @@ mongoose.Promise = global.Promise;
 const logSchema = mongoose.Schema({
   routine: {type: String, required: true},
   user: {type: String},
-  lifts: {
-    name: String,
-    weight: String,
-    unit: String,
-    sets: String,
-    reps: String
-  },
+  lifts: {type: Array},
   notes: {type: String},
   date: {type: Date, default: Date()}
 });

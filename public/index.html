@@ -19,14 +19,14 @@
       <form id="login" onsubmit="event.preventDefault(); getWorkouts();">
         <legend>Login!</legend>
         <label for="username">Username: </label><input type="text" name="username" id="username" required><br/>
-        <label for="password">Password: </label><input type="text" name="password" id="password" required><br/>
+        <label for="password">Password: </label><input type="password" name="password" id="password" required><br/>
         <input type="submit" value="Login" id="js-login">
       </form>
       <form id="signup" onsubmit="event.preventDefault(); getWorkouts();">
         <legend>Sign Up!</legend>
-        <label for="username">Username: </label><input type="text" name="username" id="username" required><br/>
-        <label for="password">Password: </label><input type="text" name="password" id="password" required><br/>
-        <label for="passconfirm">Re-enter your password: </label><input type="text" name="passconfirm" id="passconfirm" required><br/>
+        <label for="username">Username: </label><input type="text" name="username" id="username" maxlength="16" required><br/>
+        <label for="password">Password: </label><input type="password" name="password" id="password" maxlength="72" required><br/>
+        <label for="passconfirm">Re-enter your password: </label><input type="password" name="passconfirm" id="passconfirm" maxlength="72" required><br/>
         <input type="submit" value="Join" id="js-signup">
       </form>
     </section>
