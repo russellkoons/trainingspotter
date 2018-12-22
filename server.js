@@ -9,6 +9,7 @@ mongoose.set('useFindAndModify', false);
 
 const{ router: usersRouter } = require('./users');
 const{ router: logRouter} = require('./logs');
+const{ router: authRouter, local, jwt } = require('./auth')
 
 mongoose.Promise = global.Promise;
 
@@ -29,8 +30,20 @@ app.use(function (req, res, next) {
 app.use(express.static('public'));
 app.use(express.json());
 app.use(morgan('common'));
+app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/logs', logRouter);
+
+passport.use(local);
+passport.use(jwt);
+
+const jwtAuth = passport.authenticate('jwt', { session: false });
+
+app.get('/protected', jwtAuth, (req, res) => {
+  return res.json({
+    data: 'pretty sneaky sis'
+  });
+});
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');
