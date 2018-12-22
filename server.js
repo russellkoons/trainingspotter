@@ -1,7 +1,6 @@
 'use strict';
 
 require('dotenv').config();
-
 const express = require('express');
 const morgan = require('morgan');
 const passport = require('passport');
@@ -26,7 +25,7 @@ app.use(function (req, res, next) {
 
 app.use(express.static('public'));
 app.use(express.json());
-
+app.use(morgan('common'));
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/public/index.html');

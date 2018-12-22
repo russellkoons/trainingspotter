@@ -4,6 +4,7 @@
   "description": "An app to help log weightlifting workouts and routines",
   "main": "server.js",
   "dependencies": {
+    "bcrypt": "^3.0.2",
     "chai": "^4.2.0",
     "chai-http": "^4.2.0",
     "dotenv": "^6.2.0",
