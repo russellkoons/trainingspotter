@@ -592,7 +592,7 @@ describe('Auth Router', function() {
           expect(res).to.have.status(401);
         });
     });
-    it('should return a newer token', function() {
+    it.only('should return a newer token', function() {
       const token = jwt.sign(
         {
           username
