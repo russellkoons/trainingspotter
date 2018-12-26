@@ -592,34 +592,29 @@ describe('Auth Router', function() {
           expect(res).to.have.status(401);
         });
     });
-    it.only('should return a newer token', function() {
-      const token = jwt.sign(
-        {
-          username
-        },
-        JWT_SECRET,
-        {
-          algorithm: 'HS256',
-          subject: username,
-          expiresIn: '7d'
-        }
-      );
-      const decoded = jwt.decode(token);
+    it('should return a newer token', function() {
       return chai
-        .request(app)
-        .post('/auth/refresh')
-        .set('Authorization', `Bearer ${token}`)
-        .then(res => {
-          expect(res).to.have.status(200);
-          expect(res.body).to.be.a('object');
-          const token = res.body.authToken;
-          expect(token).to.be.a('string');
-          const payload = jwt.verify(token, JWT_SECRET, {
-            algorithm: ['HS256']
+      .request(app)
+      .post('/auth/login')
+      .send({ username, password })
+      .then(res => {
+        const decoded = jwt.decode(res.body.authToken);
+        return chai
+          .request(app)
+          .post('/auth/refresh')
+          .set('Authorization', `Bearer ${res.body.authToken}`)
+          .then(_res => {
+            expect(_res).to.have.status(200);
+            expect(_res.body).to.be.a('object');
+            const token = _res.body.authToken;
+            expect(token).to.be.a('string');
+            const payload = jwt.verify(token, JWT_SECRET, {
+              algorithm: ['HS256']
+            });
+            expect(payload.user).to.deep.equal({username});
+            expect(payload.exp).to.be.at.least(decoded.exp);
           });
-          expect(payload.user).to.deep.equal({username});
-          expect(payload.exp).to.be.at.least(decoded.exp);
-        });
+      });
     });
   });
 });
