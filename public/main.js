@@ -5,143 +5,23 @@
 
 let lift = 0;
 
-const MOCK_WORKOUTS = {
-  "workouts": [
-    {
-      "id": 111111,
-      "routine": "A",
-      "user": "Russell Koons",
-      "lifts": [
-        {
-          "name": "Squat",
-          "weight": 225,
-          "unit": "lbs",
-          "sets": 5,
-          "reps": 5
-        },
-        {
-          "name": "Bench Press",
-          "weight": 125,
-          "unit": "lbs",
-          "sets": 5,
-          "reps": 5
-        },
-        {
-          "name": "Row",
-          "weight": 135,
-          "unit": "lbs",
-          "sets": 5,
-          "reps": 5
-        },
-        {
-          "name": "Straight Bar",
-          "weight": 65,
-          "unit": "lbs",
-          "sets": 3,
-          "reps": 8
-        }
-      ],
-      "notes": "Yeah yeah yeahhhhhh",
-      "date": "Wed Dec 19 2018"
-    },
-    {
-      "id": 22222,
-      "routine": "B",
-      "user": "Russell Koons",
-      "lifts": [
-        {
-          "name": "Squat",
-          "weight": 225,
-          "unit": "lbs",
-          "sets": 5,
-          "reps": 5
-        },
-        {
-          "name": "Deadlift",
-          "weight": 225,
-          "unit": "lbs",
-          "sets": 1,
-          "reps": 5
-        },
-        {
-          "name": "Military Press",
-          "weight": 75,
-          "unit": "lbs",
-          "sets": 5,
-          "reps": 5
-        },
-        {
-          "name": "Cable Crunch",
-          "weight": 150,
-          "unit": "lbs",
-          "sets": 3,
-          "reps": 10
-        }
-      ],
-      "notes": "I goofed",
-      "date": "Mon Dec 17 2018"
-    },
-    {
-      "id": 33333,
-      "routine": "A",
-      "user": "Russell Koons",
-      "lifts": [
-        {
-          "name": "Squat",
-          "weight": 225,
-          "unit": "lbs",
-          "sets": 5,
-          "reps": 5
-        },
-        {
-          "name": "Bench Press",
-          "weight": 125,
-          "unit": "lbs",
-          "sets": 5,
-          "reps": 5
-        },
-        {
-          "name": "Row",
-          "weight": 135,
-          "unit": "lbs",
-          "sets": 5,
-          "reps": 5
-        },
-        {
-          "name": "Straight Bar",
-          "weight": 65,
-          "unit": "lbs",
-          "sets": 3,
-          "reps": 8
-        }
-      ],
-      "notes": "A good workout" ,
-      "date": "Fri Dec 14 2018"
-    }
-  ]
-}
-
-function getRecentWorkouts(callbackFn) {
-  setTimeout(function(){ callbackFn(MOCK_WORKOUTS)}, 1);
-}
-
 function displayWorkouts(data) {
   $('#workout-list').empty();
   $('#workout-list').removeClass('hidden');
   $('#log-buttons').removeClass('hidden');
-  for (let i = 0; i < data.workouts.length; i++) {
+  for (let i = data.length - 1; i >= 0; i--) {
     $('#workout-list').append(
-      '<p>' + data.workouts[i].date + '</p>' +
-      'Routine: ' + data.workouts[i].routine + 
+      '<p>' + data[i].date + '</p>' +
+      'Routine: ' + data[i].routine + 
       `<ol class="workout${i}"></ol>` + 
-      'Notes: ' + data.workouts[i].notes
+      'Notes: ' + data[i].notes
     );
-    for (let j = 0; j < data.workouts[i].lifts.length; j++) {
+    for (let j = 0; j < data[i].lifts.length; j++) {
       $(`.workout${i}`).append(
-        `<li>${data.workouts[i].lifts[j].name}: ${data.workouts[i].lifts[j].weight} ${data.workouts[i].lifts[j].unit}
+        `<li>${data[i].lifts[j].name}: ${data[i].lifts[j].weight} ${data[i].lifts[j].unit}
           <ul>
-            <li>Sets: ${data.workouts[i].lifts[j].sets}</li>
-            <li>Reps: ${data.workouts[i].lifts[j].reps}</li>
+            <li>Sets: ${data[i].lifts[j].sets}</li>
+            <li>Reps: ${data[i].lifts[j].reps}</li>
           </ul>
         </li>`
       );
@@ -150,17 +30,13 @@ function displayWorkouts(data) {
 }
 
 function addRoutine(lift) {
-  const date = Date();
-  console.log(date);
   const newLog = {
-    "id": 44444,
     "routine": $('#routine').val(),
     "user": "Russell Koons",
     "lifts": [
 
     ],
     "notes": $('#notes').val(),
-    "date": Date()
   };
   for (let i = 0; i <= lift; i++) {
     newLog.lifts.push({
@@ -171,52 +47,67 @@ function addRoutine(lift) {
       "reps": $(`#rep-${i}`).val()
     });
   };
-  MOCK_WORKOUTS.workouts.unshift(newLog);
+  fetch('/logs',  {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newLog)
+  })
+    .then(res => console.log(res));
+  lift = 0;
   $('#log-form').empty();
   getWorkouts();
   console.log('addRoutine working');
 }
 
-function addWorkout() {
+function createLog(lift) {
   const newLog = {
-    "id": 44444,
-    "routine": $('#routine-list').val(),
-    "user": "Russell Koons",
-    "lifts": [
-
-    ],
-    "notes": $('#notes').val(),
-    "date": Date()
+    'routine': $('#routine-list').val(),
+    'user': 'Russell Koons',
+    'lifts': [],
+    'notes': $('#notes').val()
   };
-  const found = MOCK_WORKOUTS.workouts.find(function(workout) {
-    return workout.routine === $('#routine-list').val();
-  });
-  for (let i = 0; i < found.lifts.length; i++) {
+  for (let i = 0; i < lift; i++) {
     newLog.lifts.push({
-      "name": found.lifts[i].name,
-      "weight": $(`#weight-${i}`).val(),
-      "unit": $(`#unit-${i}`).val(),
-      "sets": $(`#set-${i}`).val(),
-      "reps": $(`#rep-${i}`).val()
+      'name': $(`#name-${i}`).html(),
+      'weight': $(`#weight-${i}`).val(),
+      'unit': $(`#unit-${i}`).val(),
+      'sets': $(`#set-${i}`).val(),
+      'reps': $(`#rep-${i}`).val()
     });
-  }
-  MOCK_WORKOUTS.workouts.unshift(newLog);
+  };
+  lift = 0;
+  addWorkout(newLog);
+}
+
+function addWorkout(data) {
+  fetch('/logs', {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+    .then(res => console.log(res));
   $('#log-form').empty();
   getWorkouts();
   console.log('addWorkout working');
 }
 
-function createForm() {
+function createForm(res) {
   $('#js-choose-routine').click(event => {
     $('#new-workout').empty();
+    lift = 0;
     const routine = $('#routine-list').val();
-    const found = MOCK_WORKOUTS.workouts.find(function(workout) {
+    const found = res.find(function(workout) {
       return workout.routine === routine;
     });
-    $('#log-form').append(`<form id="new-workout" onsubmit="event.preventDefault(); addWorkout();"></form>`);
+    $('#log-form').append(`<form id="new-workout" onsubmit="event.preventDefault(); createLog(lift)"></form>`);
     for (let i = 0; i < found.lifts.length; i++) {
+      lift++;
       $('#new-workout').append(`
-      <span>${found.lifts[i].name}</span><br/>
+      <span id="name-${i}">${found.lifts[i].name}</span><br/>
         <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" id="weight-${i}" value="${found.lifts[i].weight}" required>
         <select id="unit-${i}">
           <option value="kgs">kgs</option>
@@ -228,16 +119,15 @@ function createForm() {
     };
     $('#new-workout').append(`
     <label for="notes">Notes: </label><input type="text" name="notes" id="notes"><br/>
-    <input type="submit" value="Submit" id="js-workout-submit">
+    <input id="js-workout-submit" type="submit">
     `);
     console.log('createForm working');
-  })
+  });
 }
 
 function addLift() {
   $('#log-form').on('click', '#js-add-lift', function() {
     lift++;
-    console.log(lift);
     $('#new-routine-lifts').append(`
       <label for="name-${lift}">Lift name: <input type="text" name="name-${lift}" id="name-${lift}" required>
       <label for="weight-${lift}">Weight: <input type="number" name="weight-${lift}" id="weight-${lift}" required>
@@ -254,6 +144,7 @@ function addLift() {
 
 function newRoutine() {
   $('#js-new-routine').click(event => {
+    lift = 0;
     $('#log-form').removeClass('hidden');
     $('#log-form').empty();
     $('#log-form').append(`
@@ -284,29 +175,38 @@ function newWorkout() {
   $('#js-new-log').click(event => {
     $('#log-form').removeClass('hidden');
     $('#log-form').empty();
-    let routines = [];
-    for (let i = 0; i < MOCK_WORKOUTS.workouts.length; i++) {
-      routines.push(MOCK_WORKOUTS.workouts[i].routine);
-    }
-    let list = [...new Set(routines)];
-    $('#log-form').append(
-      `Choose a routine: <select id="routine-list">
-
-      </select>
-      <button type="button" id="js-choose-routine">Submit</button>`
-    );
-    for (let i = 0; i < list.length; i++) {
-      $('#routine-list').append(`<option value="${list[i]}">${list[i]}</option>`);
-    };
-    createForm();
-    console.log('newWorkout working');
-  })
+    fetch('/logs')
+      .then(res => res.json())
+      .then(resJson => {
+        console.log(resJson);
+        let routines = [];
+        for (let i = 0; i < resJson.length; i++) {
+          routines.push(resJson[i].routine);
+        }
+        let list = [...new Set(routines)];
+        $('#log-form').append(
+          `Choose a routine: <select id="routine-list">
+    
+          </select>
+          <button type="button" id="js-choose-routine">Submit</button>`
+        );
+        for (let i = 0; i < list.length; i++) {
+          $('#routine-list').append(`<option value="${list[i]}">${list[i]}</option>`);
+        };
+        createForm(resJson);
+      });
+  });
 }
 
 function getWorkouts() {
   $('#login').addClass('hidden');
   $('#signup').addClass('hidden');
-  getRecentWorkouts(displayWorkouts);
+  fetch('/logs')
+    .then(res => res.json())
+    .then(resJson => {
+      console.log(resJson);
+      displayWorkouts(resJson);
+    });
 }
 
 $(function() {
