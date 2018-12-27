@@ -34,38 +34,64 @@ function displayWorkouts(data) {
   };
 }
 
-function editWorkout(id) {
-  console.log(id);
-  console.log('editWorkout working');
+function submitEdit(id, lift, routine) {
+  const newLog = {
+    'id': id,
+    'routine': routine,
+    'lifts': [],
+    'notes': $(`.notes`).val()
+  };
+  for (let i = 0; i < lift; i++) {
+    newLog.lifts.push({
+      'name': $(`.name-${i}`).val(),
+      'weight': $(`.weight-${i}`).val(),
+      'unit': $(`.unit-${i}`).val(),
+      'sets': $(`.set-${i}`).val(),
+      'reps': $(`.rep-${i}`).val()
+    });
+  };
+  fetch(`/logs/${id}`, {
+    method: 'put',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newLog)
+  })
+    .catch(err => console.log(err));
+  getWorkouts();
+  console.log('submitEdit working');
 }
 
 function editForm(num, logs) {
+  displayWorkouts(logs);
   $(`#log-${num}`).empty();
   const found = logs[num];
   $(`#log-${num}`).append(`
     <p>${found.date}</p>
-    <form id="edit-${num}" onsubmit="event.preventDefault(); editWorkout(${found.id});">
+    <p>Routine: ${found.routine}</p>
+    <form id="edit-${num}" onsubmit="event.preventDefault(); submitEdit('${found.id}', lift, '${found.routine}');">
 
       <label for="notes">Notes: </label><input type="text" name="notes" class="notes" value="${found.notes}"><br/>
       <input type="submit">
     </form>
   `);
-  for (let i = 0; i < found.lifts.length; i++) {
+  for (let i = found.lifts.length - 1; i >= 0; i--) {
+    lift++;
     $(`#edit-${num}`).prepend(`
       <label for="name-${i}">Lift ${i + 1}: </label><input type="text" name="name-${i}" class="name-${i}" value="${found.lifts[i].name}">
       <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" class="weight-${i}" value="${found.lifts[i].weight}">
-      <select id="unit-${i}">
+      <select class="unit-${i}">
       </select>
       <label for="set-${i}">Sets: </label><input type="number" name="set-${i}" class="set-${i}" value="${found.lifts[i].sets}" required>
       <label for="rep-${i}">Reps: </label><input type="number" name="rep-${i}" class="rep-${i}" value="${found.lifts[i].reps}" required><br/>
     `);
     if (found.lifts[i].unit === 'lbs') {
-      $(`#unit-${i}`).append(`
+      $(`.unit-${i}`).append(`
         <option value="lbs">lbs</option>
         <option value="kgs">kgs</option>
       `);
     } else {
-      $(`#unit-${i}`).append(`
+      $(`.unit-${i}`).append(`
         <option value="kgs">kgs</option>
         <option value="lbs">lbs</option>
       `);
@@ -236,6 +262,7 @@ function newWorkout(logs) {
 
 function getWorkouts() {
   logs = {};
+  lift = 0;
   $('#login').addClass('hidden');
   $('#signup').addClass('hidden');
   fetch('/logs')
