@@ -1,23 +1,28 @@
 'use strict';
 
 // Stuff I need to do:
-  // 1. Figure out the date thing
+  // 1. Figure out the date thing - moment.js
 
 let lift = 0;
+let logs = {};
 
 function displayWorkouts(data) {
   $('#workout-list').empty();
   $('#workout-list').removeClass('hidden');
   $('#log-buttons').removeClass('hidden');
-  for (let i = data.length - 1; i >= 0; i--) {
-    $('#workout-list').append(
+  for (let i = 0; i < data.length; i++) {
+    $('#workout-list').prepend(
+      `<section id="log-${i}">` +
       '<p>' + data[i].date + '</p>' +
       'Routine: ' + data[i].routine + 
-      `<ol class="workout${i}"></ol>` + 
-      'Notes: ' + data[i].notes
+      `<ol class="workout-${i}"></ol>` + 
+      'Notes: ' + data[i].notes +
+      `<br/><button type="button" id="js-edit-${i}" onclick="editForm(${i}, logs)">Edit</button><br/>` +
+      `<button type="button" id="js-delete-${i}">Delete</button>` +
+      '</section>'
     );
     for (let j = 0; j < data[i].lifts.length; j++) {
-      $(`.workout${i}`).append(
+      $(`.workout-${i}`).append(
         `<li>${data[i].lifts[j].name}: ${data[i].lifts[j].weight} ${data[i].lifts[j].unit}
           <ul>
             <li>Sets: ${data[i].lifts[j].sets}</li>
@@ -25,11 +30,51 @@ function displayWorkouts(data) {
           </ul>
         </li>`
       );
-    }
-  }
+    };
+  };
 }
 
-function addRoutine(lift) {
+function editWorkout(id) {
+  console.log(id);
+  console.log('editWorkout working');
+}
+
+function editForm(num, logs) {
+  $(`#log-${num}`).empty();
+  const found = logs[num];
+  $(`#log-${num}`).append(`
+    <p>${found.date}</p>
+    <form id="edit-${num}" onsubmit="event.preventDefault(); editWorkout(${found.id});">
+
+      <label for="notes">Notes: </label><input type="text" name="notes" class="notes" value="${found.notes}"><br/>
+      <input type="submit">
+    </form>
+  `);
+  for (let i = 0; i < found.lifts.length; i++) {
+    $(`#edit-${num}`).prepend(`
+      <label for="name-${i}">Lift ${i + 1}: </label><input type="text" name="name-${i}" class="name-${i}" value="${found.lifts[i].name}">
+      <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" class="weight-${i}" value="${found.lifts[i].weight}">
+      <select id="unit-${i}">
+      </select>
+      <label for="set-${i}">Sets: </label><input type="number" name="set-${i}" class="set-${i}" value="${found.lifts[i].sets}" required>
+      <label for="rep-${i}">Reps: </label><input type="number" name="rep-${i}" class="rep-${i}" value="${found.lifts[i].reps}" required><br/>
+    `);
+    if (found.lifts[i].unit === 'lbs') {
+      $(`#unit-${i}`).append(`
+        <option value="lbs">lbs</option>
+        <option value="kgs">kgs</option>
+      `);
+    } else {
+      $(`#unit-${i}`).append(`
+        <option value="kgs">kgs</option>
+        <option value="lbs">lbs</option>
+      `);
+    };
+  };
+  console.log('editForm working');
+}
+
+function createRoutine(lift) {
   const newLog = {
     "routine": $('#routine').val(),
     "user": "Russell Koons",
@@ -47,18 +92,8 @@ function addRoutine(lift) {
       "reps": $(`#rep-${i}`).val()
     });
   };
-  fetch('/logs',  {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(newLog)
-  })
-    .then(res => console.log(res));
-  lift = 0;
-  $('#log-form').empty();
-  getWorkouts();
-  console.log('addRoutine working');
+  addWorkout(newLog);
+  console.log('createRoutine working');
 }
 
 function createLog(lift) {
@@ -95,35 +130,43 @@ function addWorkout(data) {
   console.log('addWorkout working');
 }
 
-function createForm(res) {
-  $('#js-choose-routine').click(event => {
+function createForm(logs) {
     $('#new-workout').empty();
     lift = 0;
     const routine = $('#routine-list').val();
-    const found = res.find(function(workout) {
+    const found = logs.find(function(workout) {
       return workout.routine === routine;
     });
-    $('#log-form').append(`<form id="new-workout" onsubmit="event.preventDefault(); createLog(lift)"></form>`);
+    $('#log-form').append(`<form id="new-workout" onsubmit="event.preventDefault(); createLog(lift);"></form>`);
     for (let i = 0; i < found.lifts.length; i++) {
       lift++;
       $('#new-workout').append(`
       <span id="name-${i}">${found.lifts[i].name}</span><br/>
         <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" id="weight-${i}" value="${found.lifts[i].weight}" required>
         <select id="unit-${i}">
-          <option value="kgs">kgs</option>
-          <option value="lbs">lbs</option>
         </select>
         <label for="set-${i}">Sets: </label><input type="number" name="set-${i}" id="set-${i}" value="${found.lifts[i].sets}" required>
         <label for="rep-${i}">Reps: </label><input type="number" name="rep-${i}" id="rep-${i}" value="${found.lifts[i].reps}" required><br/>
       `);
+      if (found.lifts[i].unit === 'lbs') {
+        $(`#unit-${i}`).append(`
+          <option value="lbs">lbs</option>
+          <option value="kgs">kgs</option>
+        `);
+      } else {
+        $(`#unit-${i}`).append(`
+          <option value="kgs">kgs</option>
+          <option value="lbs">lbs</option>
+        `)
+      };
     };
     $('#new-workout').append(`
     <label for="notes">Notes: </label><input type="text" name="notes" id="notes"><br/>
-    <input id="js-workout-submit" type="submit">
+    <input type="submit">
     `);
     console.log('createForm working');
-  });
 }
+
 
 function addLift() {
   $('#log-form').on('click', '#js-add-lift', function() {
@@ -148,7 +191,7 @@ function newRoutine() {
     $('#log-form').removeClass('hidden');
     $('#log-form').empty();
     $('#log-form').append(`
-      <form id="new-routine" onsubmit="event.preventDefault(); addRoutine(lift);">
+      <form id="new-routine" onsubmit="event.preventDefault(); createRoutine(lift);">
         <section id="new-routine-lifts">
           <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine" required><br/>
           <label for="name-0">Lift name: <input type="text" name="name-0" id="name-0" required>
@@ -171,46 +214,43 @@ function newRoutine() {
   });
 }
 
-function newWorkout() {
+function newWorkout(logs) {
   $('#js-new-log').click(event => {
     $('#log-form').removeClass('hidden');
     $('#log-form').empty();
-    fetch('/logs')
-      .then(res => res.json())
-      .then(resJson => {
-        console.log(resJson);
-        let routines = [];
-        for (let i = 0; i < resJson.length; i++) {
-          routines.push(resJson[i].routine);
-        }
-        let list = [...new Set(routines)];
-        $('#log-form').append(
-          `Choose a routine: <select id="routine-list">
-    
-          </select>
-          <button type="button" id="js-choose-routine">Submit</button>`
-        );
-        for (let i = 0; i < list.length; i++) {
-          $('#routine-list').append(`<option value="${list[i]}">${list[i]}</option>`);
-        };
-        createForm(resJson);
-      });
+    let routines = [];
+    for (let i = 0; i < logs.length; i++) {
+      routines.push(logs[i].routine);
+    }
+    let list = [...new Set(routines)];
+    $('#log-form').append(
+      `Choose a routine: <select id="routine-list" onchange="createForm(logs)">
+        <option disabled selected></option>
+      </select>`
+    );
+    for (let i = 0; i < list.length; i++) {
+      $('#routine-list').append(`<option value="${list[i]}">${list[i]}</option>`);
+    };
   });
 }
 
 function getWorkouts() {
+  logs = {};
   $('#login').addClass('hidden');
   $('#signup').addClass('hidden');
   fetch('/logs')
     .then(res => res.json())
     .then(resJson => {
-      console.log(resJson);
-      displayWorkouts(resJson);
-    });
+      logs = resJson;
+      console.log(logs);
+      newWorkout(logs);
+      displayWorkouts(logs);
+    })
+    .catch(err => console.log(err));
 }
 
 $(function() {
-  newWorkout();
   newRoutine();
   addLift();
+  getWorkouts();
 })
