@@ -2,6 +2,8 @@
 
 // Stuff I need to do:
   // 1. Figure out the date thing - moment.js
+  // 2. implement .ajax instead of fetch
+  // 3. Set up the user and auth endpoints
 
 let lift = 0;
 let logs = {};
@@ -18,7 +20,7 @@ function displayWorkouts(data) {
       `<ol class="workout-${i}"></ol>` + 
       'Notes: ' + data[i].notes +
       `<br/><button type="button" id="js-edit-${i}" onclick="editForm(${i}, logs)">Edit</button><br/>` +
-      `<button type="button" id="js-delete-${i}">Delete</button>` +
+      `<button type="button" id="js-delete-${i}" onclick="deleteLog(${i}, logs);">Delete</button>` +
       '</section>'
     );
     for (let j = 0; j < data[i].lifts.length; j++) {
@@ -32,6 +34,16 @@ function displayWorkouts(data) {
       );
     };
   };
+}
+
+function deleteLog(num, logs) {
+  const id = logs[num].id;
+  fetch(`/logs/${id}`, {
+    method: 'delete'
+  })
+    .catch(err => console.log(err));
+  getWorkouts();
+  console.log('deleteLog working');
 }
 
 function submitEdit(id, lift, routine) {
@@ -74,6 +86,7 @@ function editForm(num, logs) {
       <label for="notes">Notes: </label><input type="text" name="notes" class="notes" value="${found.notes}"><br/>
       <input type="submit">
     </form>
+    <button type="button" onclick="displayWorkouts(logs);">Cancel</button>
   `);
   for (let i = found.lifts.length - 1; i >= 0; i--) {
     lift++;
@@ -156,6 +169,11 @@ function addWorkout(data) {
   console.log('addWorkout working');
 }
 
+function clearForm() {
+  lift = 0;
+  $('#log-form').empty();
+}
+
 function createForm(logs) {
     $('#new-workout').empty();
     lift = 0;
@@ -163,7 +181,10 @@ function createForm(logs) {
     const found = logs.find(function(workout) {
       return workout.routine === routine;
     });
-    $('#log-form').append(`<form id="new-workout" onsubmit="event.preventDefault(); createLog(lift);"></form>`);
+    $('#log-form').append(`
+    <form id="new-workout" onsubmit="event.preventDefault(); createLog(lift);"></form>
+    <button type="text" onclick="clearForm();">Cancel</button>
+    `);
     for (let i = 0; i < found.lifts.length; i++) {
       lift++;
       $('#new-workout').append(`
@@ -235,6 +256,7 @@ function newRoutine() {
         </section>
       </form>
       <button type="button" id="js-add-lift">Add another lift</button>
+      <button type="button" onclick="clearForm();">Cancel</button>
     `);
     console.log('newRoutine working');
   });
