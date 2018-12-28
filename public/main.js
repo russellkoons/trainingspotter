@@ -115,7 +115,7 @@ function editForm(num, logs) {
 
 function createRoutine(lift) {
   const newLog = {
-    "routine": $('#routine').val(),
+    "routine": $('#routine-name').val(),
     "user": "Russell Koons",
     "lifts": [
 
@@ -156,6 +156,7 @@ function createLog(lift) {
 }
 
 function addWorkout(data) {
+  console.log(data);
   fetch('/logs', {
     method: 'post',
     headers: {
@@ -164,26 +165,27 @@ function addWorkout(data) {
     body: JSON.stringify(data)
   })
     .then(res => console.log(res));
-  $('#log-form').empty();
+  clearForm();
   getWorkouts();
   console.log('addWorkout working');
 }
 
 function clearForm() {
   lift = 0;
-  $('#log-form').empty();
+  $('#routine').empty();
+  $('#form').empty();
 }
 
 function createForm(logs) {
-    $('#new-workout').empty();
+    $('#form').empty();
     lift = 0;
     const routine = $('#routine-list').val();
-    const found = logs.find(function(workout) {
+    const found = logs.slice().reverse().find(function(workout) {
       return workout.routine === routine;
     });
-    $('#log-form').append(`
-    <form id="new-workout" onsubmit="event.preventDefault(); createLog(lift);"></form>
-    <button type="text" onclick="clearForm();">Cancel</button>
+    $('#form').append(`
+      <form id="new-workout" onsubmit="event.preventDefault(); createLog(lift);"></form>
+      <button type="text" onclick="clearForm();">Cancel</button>
     `);
     for (let i = 0; i < found.lifts.length; i++) {
       lift++;
@@ -236,11 +238,12 @@ function newRoutine() {
   $('#js-new-routine').click(event => {
     lift = 0;
     $('#log-form').removeClass('hidden');
-    $('#log-form').empty();
-    $('#log-form').append(`
+    $('#form').empty();
+    $('#routine').empty();
+    $('#form').append(`
       <form id="new-routine" onsubmit="event.preventDefault(); createRoutine(lift);">
         <section id="new-routine-lifts">
-          <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine" required><br/>
+          <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine-name" required><br/>
           <label for="name-0">Lift name: <input type="text" name="name-0" id="name-0" required>
           <label for="weight-0">Weight: <input type="number" name="weight-0" id="weight-0" required>
           <select id="unit-0">
@@ -265,17 +268,18 @@ function newRoutine() {
 function newWorkout(logs) {
   $('#js-new-log').click(event => {
     $('#log-form').removeClass('hidden');
-    $('#log-form').empty();
+    $('#form').empty();
+    $('#routine').empty();
     let routines = [];
     for (let i = 0; i < logs.length; i++) {
       routines.push(logs[i].routine);
     }
     let list = [...new Set(routines)];
-    $('#log-form').append(
-      `Choose a routine: <select id="routine-list" onchange="createForm(logs)">
-        <option disabled selected></option>
-      </select>`
-    );
+    $('#routine').append(`
+        Choose a routine: <select id="routine-list" onchange="createForm(logs)">
+          <option disabled selected></option>
+        </select>
+      `);
     for (let i = 0; i < list.length; i++) {
       $('#routine-list').append(`<option value="${list[i]}">${list[i]}</option>`);
     };
