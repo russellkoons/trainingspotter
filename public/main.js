@@ -6,7 +6,9 @@
   // 3. Set up the user and auth endpoints
 
 let lift = 0;
-let logs = {};
+let logs;
+let token;
+let user;
 
 function signUp() {
   if ($('#signuppassword').val() !== $('#passconfirm').val()) {
@@ -24,16 +26,16 @@ function signUp() {
       body: JSON.stringify(newUser)
     })
       .catch(err => console.log(err));
-    // fetch('/auth/login', {
-    //   method: 'post',
-    //   headers: {
-    //     'Content-Type': 'application/json'
-    //   },
-    //   body: JSON.stringify(newUser)
-    // })
-    //   .then(res => res.json())
-    //   .then(resJson => console.log(resJson))
-    //   .catch(err => console.log(err));
+    fetch('/auth/login', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newUser)
+    })
+      .then(res => res.json())
+      .then(resJson => console.log(resJson))
+      .catch(err => console.log(err));
     console.log(newUser)
     console.log('signUp working');
   }
@@ -44,15 +46,26 @@ function logIn() {
     'username': $('#loginusername').val(),
     'password': $('#loginpassword').val()
   }
-  // fetch('/auth/login', {
-  //   method: postMessage,
-  //   headers: {
-  //     'Content-Type': 'application/json'
-  //   },
-  //   body: JSON.stringify(creds)
-  // })
-  //   .then(res => res.json())
-  //   .then(resJson => console.log(resJson));
+  fetch('/auth/login', {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(creds)
+  })
+    .then(res => {
+      if (res.ok) {
+        user = creds.username;
+        return res.json();
+      } else {
+        throw new Error(res.statusText);
+      }
+    })
+    .then(resJson => {
+      token = resJson.authToken;
+      getWorkouts();
+      console.log(token);
+    });
   console.log('logIn working');
 }
 
@@ -84,7 +97,7 @@ function displayWorkouts(data) {
   };
 }
 
-function deleteLog(num, logs) {
+function deleteLog(num) {
   const id = logs[num].id;
   fetch(`/logs/${id}`, {
     method: 'delete'
@@ -94,7 +107,7 @@ function deleteLog(num, logs) {
   console.log('deleteLog working');
 }
 
-function submitEdit(id, lift, routine) {
+function submitEdit(id, routine) {
   const newLog = {
     'id': id,
     'routine': routine,
@@ -122,14 +135,14 @@ function submitEdit(id, lift, routine) {
   console.log('submitEdit working');
 }
 
-function editForm(num, logs) {
+function editForm(num) {
   displayWorkouts(logs);
   $(`#log-${num}`).empty();
   const found = logs[num];
   $(`#log-${num}`).append(`
     <p>${found.date}</p>
     <p>Routine: ${found.routine}</p>
-    <form id="edit-${num}" onsubmit="event.preventDefault(); submitEdit('${found.id}', lift, '${found.routine}');">
+    <form id="edit-${num}" onsubmit="event.preventDefault(); submitEdit('${found.id}', '${found.routine}');">
 
       <label for="notes">Notes: </label><input type="text" name="notes" class="notes" value="${found.notes}"><br/>
       <input type="submit">
@@ -161,10 +174,10 @@ function editForm(num, logs) {
   console.log('editForm working');
 }
 
-function createRoutine(lift) {
+function createRoutine() {
   const newLog = {
     "routine": $('#routine-name').val(),
-    "user": "Russell Koons",
+    "user": user,
     "lifts": [
 
     ],
@@ -183,10 +196,10 @@ function createRoutine(lift) {
   console.log('createRoutine working');
 }
 
-function createLog(lift) {
+function createLog() {
   const newLog = {
     'routine': $('#routine-list').val(),
-    'user': 'Russell Koons',
+    'user': user,
     'lifts': [],
     'notes': $('#notes').val()
   };
@@ -224,7 +237,7 @@ function clearForm() {
   $('#form').empty();
 }
 
-function createForm(logs) {
+function createForm() {
     $('#form').empty();
     lift = 0;
     const routine = $('#routine-list').val();
@@ -289,7 +302,7 @@ function newRoutine() {
     $('#form').empty();
     $('#routine').empty();
     $('#form').append(`
-      <form id="new-routine" onsubmit="event.preventDefault(); createRoutine(lift);">
+      <form id="new-routine" onsubmit="event.preventDefault(); createRoutine();">
         <section id="new-routine-lifts">
           <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine-name" required><br/>
           <label for="name-0">Lift name: <input type="text" name="name-0" id="name-0" required>
@@ -313,7 +326,7 @@ function newRoutine() {
   });
 }
 
-function newWorkout(logs) {
+function newWorkout() {
   $('#js-new-log').click(event => {
     $('#log-form').removeClass('hidden');
     $('#form').empty();
@@ -324,7 +337,7 @@ function newWorkout(logs) {
     }
     let list = [...new Set(routines)];
     $('#routine').append(`
-        Choose a routine: <select id="routine-list" onchange="createForm(logs)">
+        Choose a routine: <select id="routine-list" onchange="createForm()">
           <option disabled selected></option>
         </select>
       `);
@@ -335,7 +348,7 @@ function newWorkout(logs) {
 }
 
 function getWorkouts() {
-  logs = {};
+  logs = [];
   lift = 0;
   $('#login').addClass('hidden');
   $('#signup').addClass('hidden');
@@ -344,13 +357,13 @@ function getWorkouts() {
     .then(resJson => {
       logs = resJson;
       console.log(logs);
-      newWorkout(logs);
       displayWorkouts(logs);
     })
     .catch(err => console.log(err));
 }
 
 $(function() {
+  newWorkout();
   newRoutine();
   addLift();
 })
