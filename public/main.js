@@ -8,6 +8,54 @@
 let lift = 0;
 let logs = {};
 
+function signUp() {
+  if ($('#signuppassword').val() !== $('#passconfirm').val()) {
+    $('#signup').append(`<p class="alert">Passwords must match</p>`);
+  } else {
+    const newUser = {
+      'username': $('#signupusername').val(),
+      'password': $('#signuppassword').val()
+    };
+    fetch(`/users`, {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newUser)
+    })
+      .catch(err => console.log(err));
+    // fetch('/auth/login', {
+    //   method: 'post',
+    //   headers: {
+    //     'Content-Type': 'application/json'
+    //   },
+    //   body: JSON.stringify(newUser)
+    // })
+    //   .then(res => res.json())
+    //   .then(resJson => console.log(resJson))
+    //   .catch(err => console.log(err));
+    console.log(newUser)
+    console.log('signUp working');
+  }
+}
+
+function logIn() {
+  const creds = {
+    'username': $('#loginusername').val(),
+    'password': $('#loginpassword').val()
+  }
+  // fetch('/auth/login', {
+  //   method: postMessage,
+  //   headers: {
+  //     'Content-Type': 'application/json'
+  //   },
+  //   body: JSON.stringify(creds)
+  // })
+  //   .then(res => res.json())
+  //   .then(resJson => console.log(resJson));
+  console.log('logIn working');
+}
+
 function displayWorkouts(data) {
   $('#workout-list').empty();
   $('#workout-list').removeClass('hidden');
@@ -305,5 +353,4 @@ function getWorkouts() {
 $(function() {
   newRoutine();
   addLift();
-  getWorkouts();
 })
