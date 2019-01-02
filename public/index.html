@@ -15,20 +15,11 @@
     <section>
       <p>Log your weightlifting sessions with trainingspotter!</p>
     </section>
+    <section id="user-signout">
+
+    </section>
     <section id="login-and-signup" class="hidden">
-      <form id="login" onsubmit="event.preventDefault(); makeCreds();">
-        <legend>Login!</legend>
-        <label for="loginusername">Username: </label><input type="text" name="loginusername" id="loginusername" required><br/>
-        <label for="loginpassword">Password: </label><input type="password" name="loginpassword" id="loginpassword" required><br/>
-        <input type="submit" value="Login" id="js-login">
-      </form>
-      <form id="signup" onsubmit="event.preventDefault(); signUp();">
-        <legend>Sign Up!</legend>
-        <label for="signupusername">Username: </label><input type="text" name="signupusername" id="signupusername" maxlength="16" required><br/>
-        <label for="signuppassword">Password: </label><input type="password" name="signuppassword" id="signuppassword" maxlength="72" required><br/>
-        <label for="passconfirm">Re-enter your password: </label><input type="password" name="passconfirm" id="passconfirm" maxlength="72" required><br/>
-        <input type="submit" value="Join" id="js-signup">
-      </form>
+
     </section>
     <section id="log-buttons" class="hidden">
       <button type="button" id="js-new-log" onclick="newWorkout(logs);">Log a new workout</button> or <button type="button" id="js-new-routine" onclick="newRoutine();">Create a new routine</button>

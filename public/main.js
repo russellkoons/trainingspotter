@@ -1,13 +1,17 @@
 'use strict';
 
 // Stuff I need to do:
-  // 1. Figure out the date thing - moment.js
   // 2. implement .ajax instead of fetch
 
 let lift = 0;
 let logs;
 let token;
 let user;
+
+function signOut() {
+  localStorage.removeItem('authToken');
+  displayPage();
+}
 
 function logIn(data) {
   fetch('/auth/login', {
@@ -20,6 +24,10 @@ function logIn(data) {
     .then(res => {
       if (res.ok) {
         user = data.username;
+        $('#user-signout').append(`
+          <p>Welcome ${user}!</p>
+          <button type="button" onclick="signOut();">Sign Out</button><br/>
+        `)
         return res.json();
       } else {
         throw new Error(res.statusText);
@@ -398,12 +406,42 @@ function parseJwt(token) {
 function displayPage() {
   token = localStorage.getItem('authToken');
   if (token === null) {
-    $('#login-and-signup').removeClass('hidden');
+    $('#log-buttons').addClass('hidden');
+    $('#log-form').addClass('hidden');
+    $('#workout-list').addClass('hidden');
+    $('#user-signout').empty();
+    $('#login-and-signup').empty().removeClass('hidden').append(`
+      <form id="login" onsubmit="event.preventDefault(); makeCreds();">
+        <legend>Login!</legend>
+        <label for="loginusername">Username: </label><input type="text" name="loginusername" id="loginusername" required><br/>
+        <label for="loginpassword">Password: </label><input type="password" name="loginpassword" id="loginpassword" required><br/>
+        <input type="submit" value="Login" id="js-login">
+      </form>
+      <form id="signup" onsubmit="event.preventDefault(); signUp();">
+        <legend>Sign Up!</legend>
+        <label for="signupusername">Username: </label><input type="text" name="signupusername" id="signupusername" maxlength="16" required><br/>
+        <label for="signuppassword">Password: </label><input type="password" name="signuppassword" id="signuppassword" maxlength="72" required><br/>
+        <label for="passconfirm">Re-enter your password: </label><input type="password" name="passconfirm" id="passconfirm" maxlength="72" required><br/>
+        <input type="submit" value="Join" id="js-signup">
+      </form>
+    `);
   } else {
     const parse = parseJwt(token);
-    user = parse.user.username;
-    getWorkouts();
-  }
+    const exp = parse.exp * 1000;
+    const d = new Date();
+    const date = d.getTime();
+    if (exp < date)  {
+      // refreshToken();
+      signOut();
+    } else {
+      user = parse.user.username;
+      $('#user-signout').removeClass('hidden').append(`
+        <p>Welcome ${user}!</p>
+        <button type="button" onclick="signOut();">Sign Out</button><br/>
+      `);
+      getWorkouts();
+    };
+  };
 }
 
 $(function() {
