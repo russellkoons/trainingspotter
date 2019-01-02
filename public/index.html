@@ -15,8 +15,8 @@
     <section>
       <p>Log your weightlifting sessions with trainingspotter!</p>
     </section>
-    <section role="">
-      <form id="login" onsubmit="event.preventDefault(); logIn();">
+    <section id="login-and-signup" class="hidden">
+      <form id="login" onsubmit="event.preventDefault(); makeCreds();">
         <legend>Login!</legend>
         <label for="loginusername">Username: </label><input type="text" name="loginusername" id="loginusername" required><br/>
         <label for="loginpassword">Password: </label><input type="password" name="loginpassword" id="loginpassword" required><br/>
@@ -48,7 +48,7 @@
     </section>
   </main>
   <footer role="contentinfo">
-
+    <p>Created by Russell Koons</p>
   </footer>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="main.js"></script>

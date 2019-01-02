@@ -3,12 +3,37 @@
 // Stuff I need to do:
   // 1. Figure out the date thing - moment.js
   // 2. implement .ajax instead of fetch
-  // 3. Set up the user and auth endpoints
 
 let lift = 0;
 let logs;
 let token;
 let user;
+
+function logIn(data) {
+  fetch('/auth/login', {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+    .then(res => {
+      if (res.ok) {
+        user = data.username;
+        return res.json();
+      } else {
+        throw new Error(res.statusText);
+      }
+    })
+    .then(resJson => {
+      token = resJson.authToken;
+      localStorage.setItem('authToken', token);
+      getWorkouts();
+      console.log(token);
+    })
+    .catch(err => console.log(err));
+  console.log('logIn working');
+}
 
 function signUp() {
   if ($('#signuppassword').val() !== $('#passconfirm').val()) {
@@ -25,51 +50,28 @@ function signUp() {
       },
       body: JSON.stringify(newUser)
     })
+      .then(res => {
+        if (res.ok) {
+          logIn(newUser);
+        } else {
+          throw new Error(err.statusText);
+        }
+      })
       .catch(err => console.log(err));
-    fetch('/auth/login', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(newUser)
-    })
-      .then(res => res.json())
-      .then(resJson => console.log(resJson))
-      .catch(err => console.log(err));
-    console.log(newUser)
     console.log('signUp working');
   }
 }
 
-function logIn() {
+function makeCreds() {
   const creds = {
     'username': $('#loginusername').val(),
     'password': $('#loginpassword').val()
   }
-  fetch('/auth/login', {
-    method: 'post',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(creds)
-  })
-    .then(res => {
-      if (res.ok) {
-        user = creds.username;
-        return res.json();
-      } else {
-        throw new Error(res.statusText);
-      }
-    })
-    .then(resJson => {
-      token = resJson.authToken;
-      getWorkouts();
-      console.log(token);
-    });
-  console.log('logIn working');
+  logIn(creds);
 }
 
 function displayWorkouts(data) {
+  lift = 0;
   $('#workout-list').empty();
   $('#workout-list').removeClass('hidden');
   $('#log-buttons').removeClass('hidden');
@@ -135,6 +137,20 @@ function submitEdit(id, routine) {
   console.log('submitEdit working');
 }
 
+function addNewLift() {
+  lift++;
+  $(`#lift-list`).append(`
+    <label for="name-${lift - 1}">Lift ${lift}: </label><input type="text" name="name-${lift - 1}" class="name-${lift - 1}">
+    <label for="weight-${lift - 1}">Weight: </label><input type="number" name="weight-${lift - 1}" class="weight-${lift - 1}">
+    <select class="unit-${lift - 1}">
+      <option value="kgs">kgs</option>
+      <option value="lbs">lbs</option>
+    </select>
+    <label for="set-${lift - 1}">Sets: </label><input type="number" name="set-${lift - 1}" class="set-${lift - 1}">
+    <label for="rep-${lift - 1}">Reps: </label><input type="number" name="rep-${lift - 1}" class="rep-${lift - 1}"><br/>
+  `);
+}
+
 function editForm(num) {
   displayWorkouts(logs);
   $(`#log-${num}`).empty();
@@ -143,15 +159,17 @@ function editForm(num) {
     <p>${found.date}</p>
     <p>Routine: ${found.routine}</p>
     <form id="edit-${num}" onsubmit="event.preventDefault(); submitEdit('${found.id}', '${found.routine}');">
-
+      <section id="lift-list">
+      </section>
       <label for="notes">Notes: </label><input type="text" name="notes" class="notes" value="${found.notes}"><br/>
       <input type="submit">
     </form>
+    <button type="button" onclick="addNewLift();">Add lift</button>
     <button type="button" onclick="displayWorkouts(logs);">Cancel</button>
   `);
   for (let i = found.lifts.length - 1; i >= 0; i--) {
     lift++;
-    $(`#edit-${num}`).prepend(`
+    $(`#lift-list`).prepend(`
       <label for="name-${i}">Lift ${i + 1}: </label><input type="text" name="name-${i}" class="name-${i}" value="${found.lifts[i].name}">
       <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" class="weight-${i}" value="${found.lifts[i].weight}">
       <select class="unit-${i}">
@@ -176,12 +194,13 @@ function editForm(num) {
 
 function createRoutine() {
   const newLog = {
-    "routine": $('#routine-name').val(),
-    "user": user,
-    "lifts": [
+    'routine': $('#routine-name').val(),
+    'user': user,
+    'lifts': [
 
     ],
-    "notes": $('#notes').val(),
+    'notes': $('#notes').val(),
+    'date': $('#date').val()
   };
   for (let i = 0; i <= lift; i++) {
     newLog.lifts.push({
@@ -192,6 +211,7 @@ function createRoutine() {
       "reps": $(`#rep-${i}`).val()
     });
   };
+  console.log(newLog);
   addWorkout(newLog);
   console.log('createRoutine working');
 }
@@ -201,7 +221,8 @@ function createLog() {
     'routine': $('#routine-list').val(),
     'user': user,
     'lifts': [],
-    'notes': $('#notes').val()
+    'notes': $('#notes').val(),
+    'date': $('#date').val()
   };
   for (let i = 0; i < lift; i++) {
     newLog.lifts.push({
@@ -212,7 +233,7 @@ function createLog() {
       'reps': $(`#rep-${i}`).val()
     });
   };
-  lift = 0;
+  console.log(newLog);
   addWorkout(newLog);
 }
 
@@ -272,6 +293,7 @@ function createForm() {
     };
     $('#new-workout').append(`
     <label for="notes">Notes: </label><input type="text" name="notes" id="notes"><br/>
+    <label for="date">Date: </label><input type="date" name="date" id="date"><br/>
     <input type="submit">
     `);
     console.log('createForm working');
@@ -282,7 +304,7 @@ function addLift() {
   $('#log-form').on('click', '#js-add-lift', function() {
     lift++;
     $('#new-routine-lifts').append(`
-      <label for="name-${lift}">Lift name: <input type="text" name="name-${lift}" id="name-${lift}" required>
+      <label for="name-${lift}">Lift ${lift + 1}: <input type="text" name="name-${lift}" id="name-${lift}" required>
       <label for="weight-${lift}">Weight: <input type="number" name="weight-${lift}" id="weight-${lift}" required>
       <select id="unit-${lift}">
       <option value="kgs">kgs</option>
@@ -305,7 +327,7 @@ function newRoutine() {
       <form id="new-routine" onsubmit="event.preventDefault(); createRoutine();">
         <section id="new-routine-lifts">
           <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine-name" required><br/>
-          <label for="name-0">Lift name: <input type="text" name="name-0" id="name-0" required>
+          <label for="name-0">Lift ${lift + 1}: <input type="text" name="name-0" id="name-0" required>
           <label for="weight-0">Weight: <input type="number" name="weight-0" id="weight-0" required>
           <select id="unit-0">
             <option value="kgs">kgs</option>
@@ -316,6 +338,7 @@ function newRoutine() {
         </section>
         <section id="notes-n-submit">
           <label for="notes">Notes: </label><input type="text" name="notes" id="notes"><br/>
+          <label for="date">Date: </label><input type="date" name="date" id="date"><br/>
           <input type="submit" value="Submit" id="js-routine-submit">
         </section>
       </form>
@@ -336,6 +359,7 @@ function newWorkout() {
       routines.push(logs[i].routine);
     }
     let list = [...new Set(routines)];
+    list.sort();
     $('#routine').append(`
         Choose a routine: <select id="routine-list" onchange="createForm()">
           <option disabled selected></option>
@@ -355,15 +379,36 @@ function getWorkouts() {
   fetch('/logs')
     .then(res => res.json())
     .then(resJson => {
-      logs = resJson;
+      logs = resJson.filter(obj => obj.user === user);
+      logs.sort(function(a, b) {
+        return new Date(a.date) - new Date(b.date);
+      });
       console.log(logs);
       displayWorkouts(logs);
     })
     .catch(err => console.log(err));
 }
 
+function parseJwt(token) {
+  var base64Url = token.split('.')[1];
+  var base64 = base64Url.replace('-', '+').replace('_', '/');
+  return JSON.parse(window.atob(base64));
+};
+
+function displayPage() {
+  token = localStorage.getItem('authToken');
+  if (token === null) {
+    $('#login-and-signup').removeClass('hidden');
+  } else {
+    const parse = parseJwt(token);
+    user = parse.user.username;
+    getWorkouts();
+  }
+}
+
 $(function() {
   newWorkout();
   newRoutine();
   addLift();
+  displayPage();
 })

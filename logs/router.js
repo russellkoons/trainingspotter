@@ -1,6 +1,7 @@
 'use strict';
 
 const express = require('express');
+const moment = require('moment');
 
 const {Log} = require('../models');
 
@@ -43,7 +44,8 @@ router.post('/', (req, res) => {
       routine: req.body.routine,
       user: req.body.user,
       lifts: req.body.lifts,
-      notes: req.body.notes
+      notes: req.body.notes,
+      date: moment(req.body.date).format('LL')
     })
     .then(log => res.status(201).json(log.serialize()))
     .catch(err => {
