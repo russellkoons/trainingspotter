@@ -9,9 +9,9 @@ const config = require('../config');
 const router = express.Router();
 
 const createToken = function(user) {
-  return jwt.sign({user}, config.JWT_SECRET, {
+  return jwt.sign({user}, 'GOOD_NIGHT_AND_GOOD_RIDDANCE', {
     subject: user.username,
-    expiresIn: config.JWT_EXPIRY,
+    expiresIn: '7d',
     algorithm: 'HS256'
   });
 };
