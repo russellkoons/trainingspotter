@@ -15,20 +15,31 @@
     <section>
       <p>Log your weightlifting sessions with trainingspotter!</p>
     </section>
-  </header>
-  <main id="main">
-    <section>
-      <button type="button" id="js-new-log">Log a new workout</button> or <button type="button" id="js-new-routine">Create a new routine</button>
-    </section>
-    <section id="log-form" class="hidden">
+    <section id="user-signout">
 
     </section>
-    <section id="workout-list">
+    <section id="login-and-signup" class="hidden">
+
+    </section>
+    <section id="log-buttons" class="hidden">
+      <button type="button" id="js-new-log" onclick="newWorkout(logs);">Log a new workout</button> or <button type="button" id="js-new-routine" onclick="newRoutine();">Create a new routine</button>
+    </section>
+  </header>
+  <main id="main">
+    <section id="log-form" class="hidden">
+      <div id="routine">
+
+      </div>
+      <div id="form">
+
+      </div>
+    </section>
+    <section id="workout-list" class="hidden">
 
     </section>
   </main>
   <footer role="contentinfo">
-
+    <p>Created by Russell Koons</p>
   </footer>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="main.js"></script>
