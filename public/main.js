@@ -288,37 +288,36 @@ function clearForm() {
 }
 
 function createForm() {
+  $('#form').empty();
+  lift = 0;
+  const routine = $('#routine-list').val();
+  if (routine === 'new') {
+    lift = 1;
+    $('#log-form').removeClass('hidden');
     $('#form').empty();
-    lift = 0;
-    const routine = $('#routine-list').val();
-    if (routine === 'new') {
-      lift = 1;
-      $('#log-form').removeClass('hidden');
-      $('#form').empty();
-      $('#routine').empty();
-      $('#form').append(`
-        <form id="new-routine" onsubmit="event.preventDefault(); createRoutine();">
-          <section id="lifts">
-            <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine-name" required><br/>
-            <label for="name-1">Lift ${lift}: <input type="text" name="name-1" id="name-1" required>
-            <label for="weight-1">Weight: <input type="number" name="weight-1" id="weight-1" required>
-            <select id="unit-1">
-              <option value="kgs">kgs</option>
-              <option value="lbs">lbs</option>
-            </select>
-            <label for="set-1">Sets: <input type="number" name="set-1" id="set-1" required>
-            <label for="rep-1">Reps: <input type="number" name="rep-1" id="rep-1" required><br/>
-          </section>
-          <section id="notes-n-submit">
-            <label for="notes">Notes: </label><input type="text" name="notes" id="notes"><br/>
-            <label for="date">Date: </label><input type="date" name="date" id="date"><br/>
-            <input type="submit" value="Submit" id="js-routine-submit">
-          </section>
-        </form>
-        <button type="button" id="js-add-lift">Add another lift</button>
-        <button type="button" onclick="clearForm();">Cancel</button>
-      `);
-    } else {
+    $('#form').append(`
+      <form id="new-routine" onsubmit="event.preventDefault(); createRoutine();">
+        <section id="lifts">
+          <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine-name" required><br/>
+          <label for="name-1">Lift ${lift}: <input type="text" name="name-1" id="name-1" required>
+          <label for="weight-1">Weight: <input type="number" name="weight-1" id="weight-1" required>
+          <select id="unit-1">
+            <option value="kgs">kgs</option>
+            <option value="lbs">lbs</option>
+          </select>
+          <label for="set-1">Sets: <input type="number" name="set-1" id="set-1" required>
+          <label for="rep-1">Reps: <input type="number" name="rep-1" id="rep-1" required><br/>
+        </section>
+        <section id="notes-n-submit">
+          <label for="notes">Notes: </label><input type="text" name="notes" id="notes"><br/>
+          <label for="date">Date: </label><input type="date" name="date" id="date"><br/>
+          <input type="submit" value="Submit" id="js-routine-submit">
+        </section>
+      </form>
+      <button type="button" id="js-add-lift">Add another lift</button>
+      <button type="button" onclick="clearForm();">Cancel</button>
+    `);
+  } else {
     const found = logs.slice().reverse().find(function(workout) {
       return workout.routine === routine;
     });
@@ -358,7 +357,7 @@ function createForm() {
     <input type="submit">
     `);
   }
-    console.log('createForm working');
+  console.log('createForm working');
 }
 
 
