@@ -13,6 +13,29 @@ function signOut() {
   displayPage();
 }
 
+function refreshToken() {
+  fetch('/auth/refresh', {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+    .then(res => {
+      if (res.ok) {
+        return res.json();
+      } else {
+        throw new Error(res.statusText);
+      }
+    })
+    .then(resJson => {
+      token = resJson.authToken;
+      localStorage.setItem('authToken', token);
+      displayPage();
+    })
+    .catch(err => console.log(err));
+}
+
 function logIn(data) {
   fetch('/auth/login', {
     method: 'post',
@@ -148,14 +171,14 @@ function submitEdit(id, routine) {
 function addNewLift() {
   lift++;
   $(`#lift-list`).append(`
-    <label for="name-${lift - 1}">Lift ${lift}: </label><input type="text" name="name-${lift - 1}" class="name-${lift - 1}">
-    <label for="weight-${lift - 1}">Weight: </label><input type="number" name="weight-${lift - 1}" class="weight-${lift - 1}">
-    <select class="unit-${lift - 1}">
+    <label for="name-${lift}">Lift ${lift}: </label><input type="text" name="name-${lift}" class="name-${lift}">
+    <label for="weight-${lift}">Weight: </label><input type="number" name="weight-${lift}" class="weight-${lift}">
+    <select class="unit-${lift}">
       <option value="kgs">kgs</option>
       <option value="lbs">lbs</option>
     </select>
-    <label for="set-${lift - 1}">Sets: </label><input type="number" name="set-${lift - 1}" class="set-${lift - 1}">
-    <label for="rep-${lift - 1}">Reps: </label><input type="number" name="rep-${lift - 1}" class="rep-${lift - 1}"><br/>
+    <label for="set-${lift}">Sets: </label><input type="number" name="set-${lift}" class="set-${lift}">
+    <label for="rep-${lift}">Reps: </label><input type="number" name="rep-${lift}" class="rep-${lift}"><br/>
   `);
 }
 
@@ -210,7 +233,7 @@ function createRoutine() {
     'notes': $('#notes').val(),
     'date': $('#date').val()
   };
-  for (let i = 0; i <= lift; i++) {
+  for (let i = 1; i <= lift; i++) {
     newLog.lifts.push({
       "name": $(`#name-${i}`).val(),
       "weight": $(`#weight-${i}`).val(),
@@ -219,7 +242,6 @@ function createRoutine() {
       "reps": $(`#rep-${i}`).val()
     });
   };
-  console.log(newLog);
   addWorkout(newLog);
   console.log('createRoutine working');
 }
@@ -234,14 +256,13 @@ function createLog() {
   };
   for (let i = 0; i < lift; i++) {
     newLog.lifts.push({
-      'name': $(`#name-${i}`).html(),
+      'name': $(`#name-${i}`).val(),
       'weight': $(`#weight-${i}`).val(),
       'unit': $(`#unit-${i}`).val(),
       'sets': $(`#set-${i}`).val(),
       'reps': $(`#rep-${i}`).val()
     });
   };
-  console.log(newLog);
   addWorkout(newLog);
 }
 
@@ -274,13 +295,17 @@ function createForm() {
       return workout.routine === routine;
     });
     $('#form').append(`
-      <form id="new-workout" onsubmit="event.preventDefault(); createLog(lift);"></form>
+      <form id="new-workout" onsubmit="event.preventDefault(); createLog(lift);">
+      <section id="lifts">
+      </section>
+      </form>
+      <button type="button" id="js-add-lift">Add lift</button>
       <button type="text" onclick="clearForm();">Cancel</button>
     `);
     for (let i = 0; i < found.lifts.length; i++) {
       lift++;
-      $('#new-workout').append(`
-      <span id="name-${i}">${found.lifts[i].name}</span><br/>
+      $('#lifts').append(`
+        <label for="name-${i}">Lift ${lift}: </label><input type="text" name="name-${i}" id="name-${i}" value="${found.lifts[i].name}" required>
         <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" id="weight-${i}" value="${found.lifts[i].weight}" required>
         <select id="unit-${i}">
         </select>
@@ -301,7 +326,7 @@ function createForm() {
     };
     $('#new-workout').append(`
     <label for="notes">Notes: </label><input type="text" name="notes" id="notes"><br/>
-    <label for="date">Date: </label><input type="date" name="date" id="date"><br/>
+    <label for="date">Date: </label><input type="date" name="date" id="date" required><br/>
     <input type="submit">
     `);
     console.log('createForm working');
@@ -311,8 +336,8 @@ function createForm() {
 function addLift() {
   $('#log-form').on('click', '#js-add-lift', function() {
     lift++;
-    $('#new-routine-lifts').append(`
-      <label for="name-${lift}">Lift ${lift + 1}: <input type="text" name="name-${lift}" id="name-${lift}" required>
+    $('#lifts').append(`
+      <label for="name-${lift}">Lift ${lift}: <input type="text" name="name-${lift}" id="name-${lift}" required>
       <label for="weight-${lift}">Weight: <input type="number" name="weight-${lift}" id="weight-${lift}" required>
       <select id="unit-${lift}">
       <option value="kgs">kgs</option>
@@ -327,22 +352,22 @@ function addLift() {
 
 function newRoutine() {
   $('#js-new-routine').click(event => {
-    lift = 0;
+    lift = 1;
     $('#log-form').removeClass('hidden');
     $('#form').empty();
     $('#routine').empty();
     $('#form').append(`
       <form id="new-routine" onsubmit="event.preventDefault(); createRoutine();">
-        <section id="new-routine-lifts">
+        <section id="lifts">
           <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine-name" required><br/>
-          <label for="name-0">Lift ${lift + 1}: <input type="text" name="name-0" id="name-0" required>
-          <label for="weight-0">Weight: <input type="number" name="weight-0" id="weight-0" required>
-          <select id="unit-0">
+          <label for="name-1">Lift ${lift}: <input type="text" name="name-1" id="name-1" required>
+          <label for="weight-1">Weight: <input type="number" name="weight-1" id="weight-1" required>
+          <select id="unit-1">
             <option value="kgs">kgs</option>
             <option value="lbs">lbs</option>
           </select>
-          <label for="set-0">Sets: <input type="number" name="set-0" id="set-0" required>
-          <label for="rep-0">Reps: <input type="number" name="rep-0" id="rep-0" required><br/>
+          <label for="set-1">Sets: <input type="number" name="set-1" id="set-1" required>
+          <label for="rep-1">Reps: <input type="number" name="rep-1" id="rep-1" required><br/>
         </section>
         <section id="notes-n-submit">
           <label for="notes">Notes: </label><input type="text" name="notes" id="notes"><br/>
@@ -431,8 +456,9 @@ function displayPage() {
     const d = new Date();
     const date = d.getTime();
     if (exp < date)  {
-      // refreshToken();
       signOut();
+    } else if (exp - date <= 86400000) {
+      refreshToken();
     } else {
       user = parse.user.username;
       $('#user-signout').removeClass('hidden').append(`
