@@ -1,7 +1,9 @@
 'use strict';
 
 // Stuff I need to do:
+  // 1. Add remove lift function
   // 2. implement .ajax instead of fetch
+  // 3. Password change input??
 
 let lift = 0;
 let logs;
@@ -108,13 +110,13 @@ function displayWorkouts(data) {
   $('#log-buttons').removeClass('hidden');
   for (let i = 0; i < data.length; i++) {
     $('#workout-list').prepend(
-      `<section id="log-${i}">` +
+      `<section id="log-${i}" class="log">` +
       '<p>' + data[i].date + '</p>' +
       'Routine: ' + data[i].routine + 
       `<ol class="workout-${i}"></ol>` + 
       'Notes: ' + data[i].notes +
-      `<br/><button type="button" id="js-edit-${i}" onclick="editForm(${i}, logs)">Edit</button><br/>` +
-      `<button type="button" id="js-delete-${i}" onclick="deleteLog(${i}, logs);">Delete</button>` +
+      `<br/><button type="button" id="js-edit-${i}" onclick="editForm(${i})">Edit</button><br/>` +
+      `<button type="button" id="js-delete-${i}" onclick="deleteLog(${i});">Delete</button>` +
       '</section>'
     );
     for (let j = 0; j < data[i].lifts.length; j++) {
