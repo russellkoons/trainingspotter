@@ -1,8 +1,7 @@
 'use strict';
 
 // Stuff I need to do:
-  // 2. implement .ajax instead of fetch
-  // 3. Password change input??
+  // Password change input?? New endpoint??
 
 let lift = 0;
 let logs;
@@ -105,53 +104,6 @@ function makeCreds() {
   logIn(creds);
 }
 
-function displayWorkouts(data) {
-  if (data.length === 0) {
-    $('#log-buttons').removeClass('hidden');
-    $('#workout-list').empty();
-    $('#instructions').removeClass('hidden').append(`
-      <h2>Welcome to trainingspotter!</h2>
-      <p>Since this appears to be your first time with the app, let me give you a quick rundown on how this whole thing works</p>
-      <ol>
-        <li>Click "Log a new workout" and choose "New routine"</li>
-        <li>Fill out the form to create a new routine</li>
-        <li>Click "Add lift" to put more lifts into your routine</li>
-        <li>Once your form is filled out click submit and it will be saved to the database</li>
-        <li>Next time you do that workout just pick it from the list and it'll pop up already filled out. You just need to make any adjustment for gains or changes in your workout</li>
-      </ol>
-      <p>You're ready to get started! Thanks for using trainingspotter!</p>  
-    `)
-  } else {
-    lift = 0;
-    $('#instructions').empty();
-    $('#workout-list').empty();
-    $('#workout-list').removeClass('hidden');
-    $('#log-buttons').removeClass('hidden');
-    for (let i = 0; i < data.length; i++) {
-      $('#workout-list').prepend(
-        `<section id="log-${i}" class="log">` +
-        '<p>' + data[i].date + '</p>' +
-        'Routine: ' + data[i].routine + 
-        `<ol class="workout-${i}"></ol>` + 
-        'Notes: ' + data[i].notes +
-        `<br/><button type="button" id="js-edit-${i}" onclick="editForm(${i})">Edit</button><br/>` +
-        `<button type="button" id="js-delete-${i}" onclick="deleteLog(${i});">Delete</button>` +
-        '</section>'
-      );
-      for (let j = 0; j < data[i].lifts.length; j++) {
-        $(`.workout-${i}`).append(
-          `<li>${data[i].lifts[j].name}: ${data[i].lifts[j].weight} ${data[i].lifts[j].unit}
-            <ul>
-              <li>Sets: ${data[i].lifts[j].sets}</li>
-              <li>Reps: ${data[i].lifts[j].reps}</li>
-            </ul>
-          </li>`
-        );
-      };
-    };
-  };
-}
-
 function deleteLog(num) {
   const id = logs[num].id;
   fetch(`/logs/${id}`, {
@@ -197,14 +149,16 @@ function submitEdit(id, routine) {
 function addNewLift() {
   lift++;
   $(`#lift-list`).append(`
-    <label for="name-${lift - 1}">Lift ${lift}: </label><input type="text" name="name-${lift - 1}" class="name-${lift - 1}">
-    <label for="weight-${lift - 1}">Weight: </label><input type="number" name="weight-${lift - 1}" class="weight-${lift - 1}">
-    <select class="unit-${lift - 1}">
-      <option value="kgs">kgs</option>
-      <option value="lbs">lbs</option>
-    </select>
-    <label for="set-${lift - 1}">Sets: </label><input type="number" name="set-${lift - 1}" class="set-${lift - 1}">
-    <label for="rep-${lift - 1}">Reps: </label><input type="number" name="rep-${lift - 1}" class="rep-${lift - 1}"><br/>
+    <div id="lift-${lift - 1}">
+      <label for="name-${lift - 1}">Lift ${lift}: </label><input type="text" name="name-${lift - 1}" class="name-${lift - 1}">
+      <label for="weight-${lift - 1}">Weight: </label><input type="number" name="weight-${lift - 1}" class="weight-${lift - 1}">
+      <select class="unit-${lift - 1}">
+        <option value="kgs">kgs</option>
+        <option value="lbs">lbs</option>
+      </select>
+      <label for="set-${lift - 1}">Sets: </label><input type="number" name="set-${lift - 1}" class="set-${lift - 1}">
+      <label for="rep-${lift - 1}">Reps: </label><input type="number" name="rep-${lift - 1}" class="rep-${lift - 1}">
+    </div>
   `);
 }
 
@@ -448,20 +402,50 @@ function newWorkout() {
   });
 }
 
-function getInstructions() {
-  $('#log-buttons').removeClass('hidden');
-  $('#instructions').removeClass('hidden').append(`
-    <h2>Welcome to trainingspotter!</h2>
-    <p>Since this appears to be your first time with the app, let me give you a quick rundown on how this whole thing works</p>
-    <ol>
-      <li>Click "Log a new workout" and choose "New routine"</li>
-      <li>Fill out the form to create a new routine</li>
-      <li>Click "Add lift" to put more lifts into your routine</li>
-      <li>Once your form is filled out click submit and it will be saved to the database</li>
-      <li>Next time you do that workout just pick it from the list and it'll pop up already filled out. You just need to make any adjustment for gains or changes in your workout</li>
-    </ol>
-    <p>You're ready to get started! Thanks for using trainingspotter!</p>  
-  `)
+function displayWorkouts(data) {
+  if (data.length === 0) {
+    $('#log-buttons').removeClass('hidden');
+    $('#workout-list').empty();
+    $('#instructions').removeClass('hidden').append(`
+      <h2>Welcome to trainingspotter!</h2>
+      <p>Since this appears to be your first time with the app, let me give you a quick rundown on how this whole thing works</p>
+      <ol>
+        <li>Click "Log a new workout" and choose "New routine"</li>
+        <li>Fill out the form to create a new routine</li>
+        <li>Click "Add lift" to put more lifts into your routine</li>
+        <li>Once your form is filled out click submit and it will be saved to the database</li>
+        <li>Next time you do that workout just pick it from the list and it'll pop up already filled out. You just need to make any adjustment for gains or changes in your workout</li>
+      </ol>
+      <p>You're ready to get started! Thanks for using trainingspotter!</p>  
+    `)
+  } else {
+    lift = 0;
+    $('#instructions').empty();
+    $('#workout-list').empty().removeClass('hidden');
+    $('#log-buttons').removeClass('hidden');
+    for (let i = 0; i < data.length; i++) {
+      $('#workout-list').prepend(
+        `<section id="log-${i}" class="log">` +
+        '<p>' + data[i].date + '</p>' +
+        'Routine: ' + data[i].routine + 
+        `<ol class="workout-${i}"></ol>` + 
+        'Notes: ' + data[i].notes +
+        `<br/><button type="button" id="js-edit-${i}" onclick="editForm(${i})">Edit</button><br/>` +
+        `<button type="button" id="js-delete-${i}" onclick="deleteLog(${i});">Delete</button>` +
+        '</section>'
+      );
+      for (let j = 0; j < data[i].lifts.length; j++) {
+        $(`.workout-${i}`).append(
+          `<li>${data[i].lifts[j].name}: ${data[i].lifts[j].weight} ${data[i].lifts[j].unit}
+            <ul>
+              <li>Sets: ${data[i].lifts[j].sets}</li>
+              <li>Reps: ${data[i].lifts[j].reps}</li>
+            </ul>
+          </li>`
+        );
+      };
+    };
+  };
 }
 
 function getWorkouts() {
