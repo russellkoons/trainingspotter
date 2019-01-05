@@ -104,30 +104,48 @@ function makeCreds() {
 }
 
 function displayWorkouts(data) {
-  lift = 0;
-  $('#workout-list').empty();
-  $('#workout-list').removeClass('hidden');
-  $('#log-buttons').removeClass('hidden');
-  for (let i = 0; i < data.length; i++) {
-    $('#workout-list').prepend(
-      `<section id="log-${i}" class="log">` +
-      '<p>' + data[i].date + '</p>' +
-      'Routine: ' + data[i].routine + 
-      `<ol class="workout-${i}"></ol>` + 
-      'Notes: ' + data[i].notes +
-      `<br/><button type="button" id="js-edit-${i}" onclick="editForm(${i})">Edit</button><br/>` +
-      `<button type="button" id="js-delete-${i}" onclick="deleteLog(${i});">Delete</button>` +
-      '</section>'
-    );
-    for (let j = 0; j < data[i].lifts.length; j++) {
-      $(`.workout-${i}`).append(
-        `<li>${data[i].lifts[j].name}: ${data[i].lifts[j].weight} ${data[i].lifts[j].unit}
-          <ul>
-            <li>Sets: ${data[i].lifts[j].sets}</li>
-            <li>Reps: ${data[i].lifts[j].reps}</li>
-          </ul>
-        </li>`
+  if (data.length === 0) {
+    $('#log-buttons').removeClass('hidden');
+    $('#workout-list').empty();
+    $('#instructions').removeClass('hidden').append(`
+      <h2>Welcome to trainingspotter!</h2>
+      <p>Since this appears to be your first time with the app, let me give you a quick rundown on how this whole thing works</p>
+      <ol>
+        <li>Click "Log a new workout" and choose "New routine"</li>
+        <li>Fill out the form to create a new routine</li>
+        <li>Click "Add lift" to put more lifts into your routine</li>
+        <li>Once your form is filled out click submit and it will be saved to the database</li>
+        <li>Next time you do that workout just pick it from the list and it'll pop up already filled out. You just need to make any adjustment for gains or changes in your workout</li>
+      </ol>
+      <p>You're ready to get started! Thanks for using trainingspotter!</p>  
+    `)
+  } else {
+    lift = 0;
+    $('#instructions').empty();
+    $('#workout-list').empty();
+    $('#workout-list').removeClass('hidden');
+    $('#log-buttons').removeClass('hidden');
+    for (let i = 0; i < data.length; i++) {
+      $('#workout-list').prepend(
+        `<section id="log-${i}" class="log">` +
+        '<p>' + data[i].date + '</p>' +
+        'Routine: ' + data[i].routine + 
+        `<ol class="workout-${i}"></ol>` + 
+        'Notes: ' + data[i].notes +
+        `<br/><button type="button" id="js-edit-${i}" onclick="editForm(${i})">Edit</button><br/>` +
+        `<button type="button" id="js-delete-${i}" onclick="deleteLog(${i});">Delete</button>` +
+        '</section>'
       );
+      for (let j = 0; j < data[i].lifts.length; j++) {
+        $(`.workout-${i}`).append(
+          `<li>${data[i].lifts[j].name}: ${data[i].lifts[j].weight} ${data[i].lifts[j].unit}
+            <ul>
+              <li>Sets: ${data[i].lifts[j].sets}</li>
+              <li>Reps: ${data[i].lifts[j].reps}</li>
+            </ul>
+          </li>`
+        );
+      };
     };
   };
 }
@@ -316,7 +334,7 @@ function createForm() {
           <input type="submit" value="Submit" id="js-routine-submit">
         </section>
       </form>
-      <button type="button" id="js-add-lift">Add another lift</button>
+      <button type="button" id="js-add-lift">Add lift</button>
       <button type="button" onclick="clearForm();">Cancel</button>
     `);
   } else {
@@ -380,38 +398,6 @@ function addLift() {
   });
 }
 
-// function newRoutine() {
-//   $('#js-new-routine').click(event => {
-//     lift = 1;
-//     $('#log-form').removeClass('hidden');
-//     $('#form').empty();
-//     $('#routine').empty();
-//     $('#form').append(`
-//       <form id="new-routine" onsubmit="event.preventDefault(); createRoutine();">
-//         <section id="lifts">
-//           <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine-name" required><br/>
-//           <label for="name-1">Lift ${lift}: <input type="text" name="name-1" id="name-1" required>
-//           <label for="weight-1">Weight: <input type="number" name="weight-1" id="weight-1" required>
-//           <select id="unit-1">
-//             <option value="kgs">kgs</option>
-//             <option value="lbs">lbs</option>
-//           </select>
-//           <label for="set-1">Sets: <input type="number" name="set-1" id="set-1" required>
-//           <label for="rep-1">Reps: <input type="number" name="rep-1" id="rep-1" required><br/>
-//         </section>
-//         <section id="notes-n-submit">
-//           <label for="notes">Notes: </label><input type="text" name="notes" id="notes"><br/>
-//           <label for="date">Date: </label><input type="date" name="date" id="date"><br/>
-//           <input type="submit" value="Submit" id="js-routine-submit">
-//         </section>
-//       </form>
-//       <button type="button" id="js-add-lift">Add another lift</button>
-//       <button type="button" onclick="clearForm();">Cancel</button>
-//     `);
-//     console.log('newRoutine working');
-//   });
-// }
-
 function newWorkout() {
   $('#js-new-log').click(event => {
     $('#log-form').removeClass('hidden');
@@ -433,6 +419,23 @@ function newWorkout() {
       $('#routine-list').append(`<option value="${list[i]}">${list[i]}</option>`);
     };
   });
+}
+
+function getInstructions() {
+  $('#log-buttons').removeClass('hidden');
+  $('#instructions').removeClass('hidden').append(`
+    <h2>Welcome to trainingspotter!</h2>
+    <p>Since this appears to be your first time with the app, let me give you a quick rundown on how this whole thing works</p>
+    <ol>
+      <li>Click "Log a new workout" and choose "New routine"</li>
+      <li>Fill out the form to create a new routine</li>
+      <li>Click "Add lift" to put more lifts into your routine</li>
+      <li>Once your form is filled out click submit and it will be saved to the database</li>
+      <li>Next time you do that workout just pick it from the list and it'll pop up already filled out. You just need to make any adjustment for gains or changes in your workout</li>
+    </ol>
+    <p>You're ready to get started! Thanks for using trainingspotter!</p>  
+  `)
+  console.log('getInstructions working');
 }
 
 function getWorkouts() {
@@ -503,7 +506,6 @@ function displayPage() {
 
 $(function() {
   newWorkout();
-  // newRoutine();
   addLift();
   displayPage();
 })
