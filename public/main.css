@@ -8,15 +8,21 @@ html {
 }
 
 .center {
-  margin: 0 auto;
+  margin: 10px auto;
   text-align: center;
   max-width: 600px;
   background-color: rgb(189, 186, 186);
   padding: 10px;
+  border: 3px solid;
+  border-color: gray;
 }
 
 h1 {
   color: red;
+}
+
+ol {
+  text-align: left;
 }
 
 .alert {
@@ -26,9 +32,11 @@ h1 {
 .form {
   max-width: 600px;
   background-color: rgb(189, 186, 186);
-  margin: 0 auto;
+  margin: 10px auto;
   text-align: left;
   padding: 10px;
+  border: 3px solid;
+  border-color: gray;
 }
 
 input[type=number] {
@@ -41,7 +49,7 @@ input[type=number] {
   padding: 10px 20px 10px 20px;
   margin: 10px auto;
   border: 3px solid;
-  border-color: gray
+  border-color: gray;
 }
 
 .flex-grid {

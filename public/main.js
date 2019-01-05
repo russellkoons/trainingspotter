@@ -1,7 +1,6 @@
 'use strict';
 
 // Stuff I need to do:
-  // 1. Add remove lift function
   // 2. implement .ajax instead of fetch
   // 3. Password change input??
 
@@ -62,13 +61,11 @@ function logIn(data) {
       token = resJson.authToken;
       localStorage.setItem('authToken', token);
       getWorkouts();
-      console.log(token);
     })
     .catch(err => {
       $('#login').append('<p class="alert">Username or password is incorrect</p>')
       console.log(err);
     });
-  console.log('logIn working');
 }
 
 function signUp() {
@@ -97,7 +94,6 @@ function signUp() {
         $('#signup').append('<p class="alert">Username already in use</p>')
         console.log(err)
       });
-    console.log('signUp working');
   }
 }
 
@@ -161,9 +157,11 @@ function deleteLog(num) {
   fetch(`/logs/${id}`, {
     method: 'delete'
   })
-    .catch(err => console.log(err));
+    .catch(err => {
+      $('#log-buttons').append('<p class="alert">Delete failed</p>');
+      console.log(err);
+    });
   getWorkouts();
-  console.log('deleteLog working');
 }
 
 function submitEdit(id, routine) {
@@ -189,22 +187,24 @@ function submitEdit(id, routine) {
     },
     body: JSON.stringify(newLog)
   })
-    .catch(err => console.log(err));
+    .catch(err => {
+      $('#log-buttons').append('<p class="alert">Log edit failed!</p>') 
+      console.log(err)
+    });
   getWorkouts();
-  console.log('submitEdit working');
 }
 
 function addNewLift() {
   lift++;
   $(`#lift-list`).append(`
-    <label for="name-${lift}">Lift ${lift}: </label><input type="text" name="name-${lift}" class="name-${lift}">
-    <label for="weight-${lift}">Weight: </label><input type="number" name="weight-${lift}" class="weight-${lift}">
-    <select class="unit-${lift}">
+    <label for="name-${lift - 1}">Lift ${lift}: </label><input type="text" name="name-${lift - 1}" class="name-${lift - 1}">
+    <label for="weight-${lift - 1}">Weight: </label><input type="number" name="weight-${lift - 1}" class="weight-${lift - 1}">
+    <select class="unit-${lift - 1}">
       <option value="kgs">kgs</option>
       <option value="lbs">lbs</option>
     </select>
-    <label for="set-${lift}">Sets: </label><input type="number" name="set-${lift}" class="set-${lift}">
-    <label for="rep-${lift}">Reps: </label><input type="number" name="rep-${lift}" class="rep-${lift}"><br/>
+    <label for="set-${lift - 1}">Sets: </label><input type="number" name="set-${lift - 1}" class="set-${lift - 1}">
+    <label for="rep-${lift - 1}">Reps: </label><input type="number" name="rep-${lift - 1}" class="rep-${lift - 1}"><br/>
   `);
 }
 
@@ -249,7 +249,6 @@ function editForm(num) {
       `);
     };
   };
-  console.log('editForm working');
 }
 
 function createRoutine() {
@@ -272,7 +271,6 @@ function createRoutine() {
     });
   };
   addWorkout(newLog);
-  console.log('createRoutine working');
 }
 
 function createLog() {
@@ -296,7 +294,6 @@ function createLog() {
 }
 
 function addWorkout(data) {
-  console.log(data);
   fetch('/logs', {
     method: 'post',
     headers: {
@@ -304,17 +301,27 @@ function addWorkout(data) {
     },
     body: JSON.stringify(data)
   })
-    .then(res => console.log(res))
-    .catch(err => console.log(err));
+    .then(res => {
+      if (res.ok) {
+        clearForm();
+        getWorkouts();
+      } else {
+        throw new Error(res.statusText);
+      }
+    })
+    .catch(err => {
+      $('#log-buttons').append('<p class="alert">Something went wrong!</p>') 
+      console.log(err);
+    });
   clearForm();
   getWorkouts();
-  console.log('addWorkout working');
 }
 
 function clearForm() {
   lift = 0;
   $('#routine').empty();
   $('#form').empty();
+  $('#log-form').addClass('hidden');
 }
 
 function createForm() {
@@ -393,7 +400,6 @@ function createForm() {
     <input type="submit">
     `);
   }
-  console.log('createForm working');
 }
 
 function removeLift() {
@@ -416,7 +422,6 @@ function addLift() {
         <label for="rep-${lift - 1}">Reps: <input type="number" name="rep-${lift - 1}" id="rep-${lift - 1}" required><br/>
       </div>
     `);
-    console.log('addLift working');
   });
 }
 
@@ -457,12 +462,11 @@ function getInstructions() {
     </ol>
     <p>You're ready to get started! Thanks for using trainingspotter!</p>  
   `)
-  console.log('getInstructions working');
 }
 
 function getWorkouts() {
   logs = [];
-  lift = 0;
+  clearForm();
   $('#login').addClass('hidden');
   $('#signup').addClass('hidden');
   fetch('/logs')
@@ -472,10 +476,12 @@ function getWorkouts() {
       logs.sort(function(a, b) {
         return new Date(a.date) - new Date(b.date);
       });
-      console.log(logs);
       displayWorkouts(logs);
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      $('#log-buttons').append('<p class="alert">Something went wrong!</p>') 
+      console.log(err)
+    });
 }
 
 function parseJwt(token) {
@@ -502,8 +508,8 @@ function displayPage() {
       <form id="signup" onsubmit="event.preventDefault(); signUp();">
         <legend>Sign Up!</legend>
         <label for="signupusername">Username: </label><input type="text" name="signupusername" id="signupusername" maxlength="16" required><br/>
-        <label for="signuppassword">Password: </label><input type="password" name="signuppassword" id="signuppassword" maxlength="72" required><br/>
-        <label for="passconfirm">Re-enter your password: </label><input type="password" name="passconfirm" id="passconfirm" maxlength="72" required><br/>
+        <label for="signuppassword">Password: </label><input type="password" name="signuppassword" id="signuppassword" minlength="8" maxlength="72" required><br/>
+        <label for="passconfirm">Re-enter your password: </label><input type="password" name="passconfirm" id="passconfirm" minlength="8" maxlength="72" required><br/>
         <input type="submit" value="Join" id="js-signup">
       </form>
     `);
