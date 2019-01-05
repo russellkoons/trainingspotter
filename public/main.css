@@ -19,7 +19,9 @@ h1 {
   color: red;
 }
 
-
+.alert {
+  color: red;
+}
 
 .form {
   max-width: 600px;

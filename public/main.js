@@ -64,7 +64,10 @@ function logIn(data) {
       getWorkouts();
       console.log(token);
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      $('#login').append('<p class="alert">Username or password is incorrect</p>')
+      console.log(err);
+    });
   console.log('logIn working');
 }
 
@@ -87,10 +90,13 @@ function signUp() {
         if (res.ok) {
           logIn(newUser);
         } else {
-          throw new Error(err.statusText);
+          throw new Error(res.statusText);
         }
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        $('#signup').append('<p class="alert">Username already in use</p>')
+        console.log(err)
+      });
     console.log('signUp working');
   }
 }
@@ -216,17 +222,20 @@ function editForm(num) {
       <input type="submit">
     </form>
     <button type="button" onclick="addNewLift();">Add lift</button>
+    <button type="button" onclick="removeLift();">Remove lift</button>
     <button type="button" onclick="displayWorkouts(logs);">Cancel</button>
   `);
   for (let i = found.lifts.length - 1; i >= 0; i--) {
     lift++;
     $(`#lift-list`).prepend(`
-      <label for="name-${i}">Lift ${i + 1}: </label><input type="text" name="name-${i}" class="name-${i}" value="${found.lifts[i].name}">
-      <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" class="weight-${i}" value="${found.lifts[i].weight}">
-      <select class="unit-${i}">
-      </select>
-      <label for="set-${i}">Sets: </label><input type="number" name="set-${i}" class="set-${i}" value="${found.lifts[i].sets}" required>
-      <label for="rep-${i}">Reps: </label><input type="number" name="rep-${i}" class="rep-${i}" value="${found.lifts[i].reps}" required><br/>
+      <div id="lift-${i}">
+        <label for="name-${i}">Lift ${i + 1}: </label><input type="text" name="name-${i}" class="name-${i}" value="${found.lifts[i].name}">
+        <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" class="weight-${i}" value="${found.lifts[i].weight}">
+        <select class="unit-${i}">
+        </select>
+        <label for="set-${i}">Sets: </label><input type="number" name="set-${i}" class="set-${i}" value="${found.lifts[i].sets}" required>
+        <label for="rep-${i}">Reps: </label><input type="number" name="rep-${i}" class="rep-${i}" value="${found.lifts[i].reps}" required><br/>
+      </div>
     `);
     if (found.lifts[i].unit === 'lbs') {
       $(`.unit-${i}`).append(`
@@ -253,7 +262,7 @@ function createRoutine() {
     'notes': $('#notes').val(),
     'date': $('#date').val()
   };
-  for (let i = 1; i <= lift; i++) {
+  for (let i = 0; i < lift; i++) {
     newLog.lifts.push({
       "name": $(`#name-${i}`).val(),
       "weight": $(`#weight-${i}`).val(),
@@ -295,7 +304,8 @@ function addWorkout(data) {
     },
     body: JSON.stringify(data)
   })
-    .then(res => console.log(res));
+    .then(res => console.log(res))
+    .catch(err => console.log(err));
   clearForm();
   getWorkouts();
   console.log('addWorkout working');
@@ -312,21 +322,23 @@ function createForm() {
   lift = 0;
   const routine = $('#routine-list').val();
   if (routine === 'new') {
-    lift = 1;
+    lift++;
     $('#log-form').removeClass('hidden');
     $('#form').empty();
     $('#form').append(`
       <form id="new-routine" onsubmit="event.preventDefault(); createRoutine();">
         <section id="lifts">
-          <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine-name" required><br/>
-          <label for="name-1">Lift ${lift}: <input type="text" name="name-1" id="name-1" required>
-          <label for="weight-1">Weight: <input type="number" name="weight-1" id="weight-1" required>
-          <select id="unit-1">
-            <option value="kgs">kgs</option>
-            <option value="lbs">lbs</option>
-          </select>
-          <label for="set-1">Sets: <input type="number" name="set-1" id="set-1" required>
-          <label for="rep-1">Reps: <input type="number" name="rep-1" id="rep-1" required><br/>
+          <div id="lift-0">
+            <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine-name" required><br/>
+            <label for="name-0">Lift 1: <input type="text" name="name-0" id="name-0" required>
+            <label for="weight-0">Weight: <input type="number" name="weight-0" id="weight-0" required>
+            <select id="unit-0">
+              <option value="kgs">kgs</option>
+              <option value="lbs">lbs</option>
+            </select>
+            <label for="set-0">Sets: <input type="number" name="set-0" id="set-0" required>
+            <label for="rep-0">Reps: <input type="number" name="rep-0" id="rep-0" required><br/>
+          </div>
         </section>
         <section id="notes-n-submit">
           <label for="notes">Notes: </label><input type="text" name="notes" id="notes"><br/>
@@ -335,6 +347,7 @@ function createForm() {
         </section>
       </form>
       <button type="button" id="js-add-lift">Add lift</button>
+      <button type="button" onclick="removeLift();">Remove lift</button>
       <button type="button" onclick="clearForm();">Cancel</button>
     `);
   } else {
@@ -347,17 +360,20 @@ function createForm() {
       </section>
       </form>
       <button type="button" id="js-add-lift">Add lift</button>
+      <button type="button" onclick="removeLift();">Remove lift</button>
       <button type="text" onclick="clearForm();">Cancel</button>
     `);
     for (let i = 0; i < found.lifts.length; i++) {
       lift++;
       $('#lifts').append(`
-        <label for="name-${i}">Lift ${lift}: </label><input type="text" name="name-${i}" id="name-${i}" value="${found.lifts[i].name}" required>
-        <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" id="weight-${i}" value="${found.lifts[i].weight}" required>
-        <select id="unit-${i}">
-        </select>
-        <label for="set-${i}">Sets: </label><input type="number" name="set-${i}" id="set-${i}" value="${found.lifts[i].sets}" required>
-        <label for="rep-${i}">Reps: </label><input type="number" name="rep-${i}" id="rep-${i}" value="${found.lifts[i].reps}" required><br/>
+        <div id="lift-${i}">
+          <label for="name-${i}">Lift ${lift}: </label><input type="text" name="name-${i}" id="name-${i}" value="${found.lifts[i].name}" required>
+          <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" id="weight-${i}" value="${found.lifts[i].weight}" required>
+          <select id="unit-${i}">
+          </select>
+          <label for="set-${i}">Sets: </label><input type="number" name="set-${i}" id="set-${i}" value="${found.lifts[i].sets}" required>
+          <label for="rep-${i}">Reps: </label><input type="number" name="rep-${i}" id="rep-${i}" value="${found.lifts[i].reps}" required><br/>
+        </div>
       `);
       if (found.lifts[i].unit === 'lbs') {
         $(`#unit-${i}`).append(`
@@ -380,19 +396,25 @@ function createForm() {
   console.log('createForm working');
 }
 
+function removeLift() {
+  lift--;
+  $(`#lift-${lift}`).remove();
+}
 
 function addLift() {
   $('#log-form').on('click', '#js-add-lift', function() {
     lift++;
     $('#lifts').append(`
-      <label for="name-${lift}">Lift ${lift}: <input type="text" name="name-${lift}" id="name-${lift}" required>
-      <label for="weight-${lift}">Weight: <input type="number" name="weight-${lift}" id="weight-${lift}" required>
-      <select id="unit-${lift}">
-      <option value="kgs">kgs</option>
-      <option value="lbs">lbs</option>
-      </select>
-      <label for="set-${lift}">Sets: <input type="number" name="set-${lift}" id="set-${lift}" required>
-      <label for="rep-${lift}">Reps: <input type="number" name="rep-${lift}" id="rep-${lift}" required><br/>
+      <div id="lift-${lift - 1}">
+        <label for="name-${lift - 1}">Lift ${lift}: <input type="text" name="name-${lift - 1}" id="name-${lift - 1}" required>
+        <label for="weight-${lift - 1}">Weight: <input type="number" name="weight-${lift - 1}" id="weight-${lift - 1}" required>
+        <select id="unit-${lift - 1}">
+        <option value="kgs">kgs</option>
+        <option value="lbs">lbs</option>
+        </select>
+        <label for="set-${lift - 1}">Sets: <input type="number" name="set-${lift - 1}" id="set-${lift - 1}" required>
+        <label for="rep-${lift - 1}">Reps: <input type="number" name="rep-${lift - 1}" id="rep-${lift - 1}" required><br/>
+      </div>
     `);
     console.log('addLift working');
   });
@@ -467,6 +489,7 @@ function displayPage() {
   if (token === null) {
     $('#log-buttons').addClass('hidden');
     $('#log-form').addClass('hidden');
+    $('#instructions').addClass('hidden');
     $('#workout-list').addClass('hidden');
     $('#user-signout').empty();
     $('#login-and-signup').empty().removeClass('hidden').append(`
