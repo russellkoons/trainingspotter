@@ -67,14 +67,13 @@ function logIn(data) {
       getWorkouts();
     })
     .catch(err => {
-      $('#login').append('<p class="alert">Username or password is incorrect</p>')
-      console.log(err);
+      $('#login-error').empty().append(`<p class="alert">Username or password is incorrect</p>`);
     });
 }
 
 function signUp() {
   if ($('#signuppassword').val() !== $('#passconfirm').val()) {
-    $('#signup').append(`<p class="alert">Passwords must match</p>`);
+    $('#signup-error').empty().append(`<p class="alert">Passwords must match</p>`);
   } else {
     const newUser = {
       'username': $('#signupusername').val(),
@@ -91,12 +90,16 @@ function signUp() {
         if (res.ok) {
           logIn(newUser);
         } else {
-          throw new Error(res.statusText);
+          return res.json();
         }
       })
+      .then(resJson => {
+        $('#signup-error').empty().append(`<p class="alert">${resJson.message}</p>`);
+        console.log(resJson);
+      })
       .catch(err => {
-        $('#signup').append('<p class="alert">Username already in use</p>')
-        console.log(err)
+        $('#signup-error').empty().append('<p class="alert">Something went wrong!</p>');
+        console.log(err);
       });
   }
 }
@@ -415,14 +418,14 @@ function displayWorkouts(data) {
         <section id="log-${i}" class="box">
           <p class="center">${data[i].date}</p>
           <p class="left">Routine: ${data[i].routine}</p> 
-          <ol class="workout-${i}"></ol> 
+          <ol id="workout-${i}" class="left"></ol> 
           <p class="left">Notes: ${data[i].notes}</p>
           <button type="button" id="js-edit-${i}" onclick="editForm(${i})">Edit</button>
           <button type="button" id="js-delete-${i}" onclick="deleteLog(${i});">Delete</button>
         </section>
       `);
       for (let j = 0; j < data[i].lifts.length; j++) {
-        $(`.workout-${i}`).append(
+        $(`#workout-${i}`).append(
           `<li>${data[i].lifts[j].name}: ${data[i].lifts[j].weight}${data[i].lifts[j].unit} Sets: ${data[i].lifts[j].sets} Reps: ${data[i].lifts[j].reps}</li>`
         );
       };
@@ -472,6 +475,8 @@ function displayPage() {
         <label for="loginpassword">Password: </label><input type="password" name="loginpassword" id="loginpassword" required><br/>
         <input type="submit" value="Login" id="js-login">
         <button type="button" onclick="guestLogin();">Login as guest</button>
+        <div id="login-error">
+        </div>
       </form>
       <form id="signup" onsubmit="event.preventDefault(); signUp();">
         <legend>Sign Up!</legend>
@@ -479,6 +484,8 @@ function displayPage() {
         <label for="signuppassword">Password: </label><input type="password" name="signuppassword" id="signuppassword" minlength="8" maxlength="72" required><br/>
         <label for="passconfirm">Re-enter your password: </label><input type="password" name="passconfirm" id="passconfirm" minlength="8" maxlength="72" required><br/>
         <input type="submit" value="Join" id="js-signup">
+        <div id="signup-error">
+        </div>
       </form>
     `);
   } else {
