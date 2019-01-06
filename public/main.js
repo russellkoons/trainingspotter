@@ -415,7 +415,7 @@ function displayWorkouts(data) {
   if (data.length === 0) {
     $('#log-buttons').removeClass('hidden');
     $('#workout-list').empty();
-    $('#instructions').removeClass('hidden').append(`
+    $('#instructions').empty().removeClass('hidden').append(`
       <h2>Welcome to trainingspotter!</h2>
       <p>Since this appears to be your first time with the app, let me give you a quick rundown on how this whole thing works</p>
       <ol>
@@ -462,6 +462,7 @@ function getWorkouts() {
   clearForm();
   $('#login').addClass('hidden');
   $('#signup').addClass('hidden');
+  $('#instructions').addClass('hidden');
   fetch('/logs')
     .then(res => res.json())
     .then(resJson => {
