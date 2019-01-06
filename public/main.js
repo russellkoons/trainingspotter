@@ -1,9 +1,5 @@
 'use strict';
 
-// Stuff I need to do:
-  // login as guest button
-
-
 let lift = 0;
 let logs;
 let token;
@@ -155,22 +151,6 @@ function submitEdit(id, routine) {
   getWorkouts();
 }
 
-function addNewLift() {
-  lift++;
-  $(`#lift-list`).append(`
-    <div id="lift-${lift - 1}">
-      <label for="name-${lift - 1}">Lift ${lift}: </label><input type="text" name="name-${lift - 1}" class="name-${lift - 1}">
-      <label for="weight-${lift - 1}">Weight: </label><input type="number" name="weight-${lift - 1}" class="weight-${lift - 1}">
-      <select class="unit-${lift - 1}">
-        <option value="kgs">kgs</option>
-        <option value="lbs">lbs</option>
-      </select>
-      <label for="set-${lift - 1}">Sets: </label><input type="number" name="set-${lift - 1}" class="set-${lift - 1}">
-      <label for="rep-${lift - 1}">Reps: </label><input type="number" name="rep-${lift - 1}" class="rep-${lift - 1}">
-    </div>
-  `);
-}
-
 function editForm(num) {
   displayWorkouts(logs);
   $(`#log-${num}`).empty();
@@ -179,18 +159,18 @@ function editForm(num) {
     <p>${found.date}</p>
     <p>Routine: ${found.routine}</p>
     <form id="edit-${num}" onsubmit="event.preventDefault(); submitEdit('${found.id}', '${found.routine}');">
-      <section id="lift-list">
+      <section id="lifts">
       </section>
       <label for="notes">Notes: </label><input type="text" name="notes" class="notes" value="${found.notes}"><br/>
       <input type="submit">
     </form>
-    <button type="button" onclick="addNewLift();">Add lift</button>
+    <button type="button" onclick="addLift();">Add lift</button>
     <button type="button" onclick="removeLift();">Remove lift</button>
     <button type="button" onclick="displayWorkouts(logs);">Cancel</button>
   `);
   for (let i = found.lifts.length - 1; i >= 0; i--) {
     lift++;
-    $(`#lift-list`).prepend(`
+    $(`#lifts`).prepend(`
       <div id="lift-${i}">
         <label for="name-${i}">Lift ${i + 1}: </label><input type="text" name="name-${i}" class="name-${i}" value="${found.lifts[i].name}">
         <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" class="weight-${i}" value="${found.lifts[i].weight}">
@@ -316,7 +296,7 @@ function createForm() {
           <input type="submit" value="Submit" id="js-routine-submit">
         </section>
       </form>
-      <button type="button" id="js-add-lift">Add lift</button>
+      <button type="button" onclick="addLift();">Add lift</button>
       <button type="button" onclick="removeLift();">Remove lift</button>
       <button type="button" onclick="clearForm();">Cancel</button>
     `);
@@ -329,7 +309,7 @@ function createForm() {
       <section id="lifts">
       </section>
       </form>
-      <button type="button" id="js-add-lift">Add lift</button>
+      <button type="button" onclick="addLift();">Add lift</button>
       <button type="button" onclick="removeLift();">Remove lift</button>
       <button type="text" onclick="clearForm();">Cancel</button>
     `);
@@ -371,21 +351,19 @@ function removeLift() {
 }
 
 function addLift() {
-  $('#log-form').on('click', '#js-add-lift', function() {
-    lift++;
-    $('#lifts').append(`
-      <div id="lift-${lift - 1}">
-        <label for="name-${lift - 1}">Lift ${lift}: <input type="text" name="name-${lift - 1}" id="name-${lift - 1}" required>
-        <label for="weight-${lift - 1}">Weight: <input type="number" name="weight-${lift - 1}" id="weight-${lift - 1}" required>
-        <select id="unit-${lift - 1}">
-        <option value="kgs">kgs</option>
-        <option value="lbs">lbs</option>
-        </select>
-        <label for="set-${lift - 1}">Sets: <input type="number" name="set-${lift - 1}" id="set-${lift - 1}" required>
-        <label for="rep-${lift - 1}">Reps: <input type="number" name="rep-${lift - 1}" id="rep-${lift - 1}" required><br/>
-      </div>
-    `);
-  });
+  lift++;
+  $('#lifts').append(`
+    <div id="lift-${lift - 1}">
+      <label for="name-${lift - 1}">Lift ${lift}: <input type="text" name="name-${lift - 1}" id="name-${lift - 1}" required>
+      <label for="weight-${lift - 1}">Weight: <input type="number" name="weight-${lift - 1}" id="weight-${lift - 1}" required>
+      <select id="unit-${lift - 1}">
+      <option value="kgs">kgs</option>
+      <option value="lbs">lbs</option>
+      </select>
+      <label for="set-${lift - 1}">Sets: <input type="number" name="set-${lift - 1}" id="set-${lift - 1}" required>
+      <label for="rep-${lift - 1}">Reps: <input type="number" name="rep-${lift - 1}" id="rep-${lift - 1}" required><br/>
+    </div>
+  `);
 }
 
 function newWorkout() {
@@ -433,24 +411,19 @@ function displayWorkouts(data) {
     $('#workout-list').empty().removeClass('hidden');
     $('#log-buttons').removeClass('hidden');
     for (let i = 0; i < data.length; i++) {
-      $('#workout-list').prepend(
-        `<section id="log-${i}" class="log">` +
-        '<p>' + data[i].date + '</p>' +
-        'Routine: ' + data[i].routine + 
-        `<ol class="workout-${i}"></ol>` + 
-        'Notes: ' + data[i].notes +
-        `<br/><button type="button" id="js-edit-${i}" onclick="editForm(${i})">Edit</button><br/>` +
-        `<button type="button" id="js-delete-${i}" onclick="deleteLog(${i});">Delete</button>` +
-        '</section>'
-      );
+      $('#workout-list').prepend(`
+        <section id="log-${i}" class="box">
+          <p class="center">${data[i].date}</p>
+          <p class="left">Routine: ${data[i].routine}</p> 
+          <ol class="workout-${i}"></ol> 
+          <p class="left">Notes: ${data[i].notes}</p>
+          <button type="button" id="js-edit-${i}" onclick="editForm(${i})">Edit</button>
+          <button type="button" id="js-delete-${i}" onclick="deleteLog(${i});">Delete</button>
+        </section>
+      `);
       for (let j = 0; j < data[i].lifts.length; j++) {
         $(`.workout-${i}`).append(
-          `<li>${data[i].lifts[j].name}: ${data[i].lifts[j].weight} ${data[i].lifts[j].unit}
-            <ul>
-              <li>Sets: ${data[i].lifts[j].sets}</li>
-              <li>Reps: ${data[i].lifts[j].reps}</li>
-            </ul>
-          </li>`
+          `<li>${data[i].lifts[j].name}: ${data[i].lifts[j].weight}${data[i].lifts[j].unit} Sets: ${data[i].lifts[j].sets} Reps: ${data[i].lifts[j].reps}</li>`
         );
       };
     };
@@ -530,6 +503,5 @@ function displayPage() {
 
 $(function() {
   newWorkout();
-  addLift();
   displayPage();
 })
