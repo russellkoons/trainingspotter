@@ -116,10 +116,6 @@ input[type=date] {
     width: 40px;
   }
 
-  label {
-    display: inline;
-  }
-
   .left {
     margin-left: 140px;
     margin-right: 100px;

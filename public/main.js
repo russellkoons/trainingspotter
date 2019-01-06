@@ -177,7 +177,7 @@ function editForm(num) {
     lift++;
     $(`#lifts`).prepend(`
       <div id="lift-${i}">
-        <label for="name-${i}">Lift ${i + 1}: </label><input type="text" name="name-${i}" id="name-${i}" class="large" value="${found.lifts[i].name}">
+        <label for="name-${i}" class="smallscreen">Lift ${i + 1}: </label><input type="text" name="name-${i}" id="name-${i}" class="large" value="${found.lifts[i].name}">
         <div class="smallscreen">
         <label for="weight-${i}" class="inline">Weight: </label>
           <input type="number" name="weight-${i}" id="weight-${i}" class="medium" value="${found.lifts[i].weight}">
@@ -286,7 +286,7 @@ function createForm() {
         <label for="routine" class="formlabel">Routine Name: </label><input type="text" name="routine" id="routine-name" required><br/>
         <section id="lifts">
           <div id="lift-0">
-            <label for="name-0">Lift 1: </label><input type="text" name="name-0" id="name-0" class="large" required>
+            <label for="name-0" class="smallscreen">Lift 1: </label><input type="text" name="name-0" id="name-0" class="large" required>
             <div class="smallscreen">
             <label for="weight-0" class="inline">Weight: </label>
               <input type="number" name="weight-0" id="weight-0" class="medium" required>
@@ -330,7 +330,7 @@ function createForm() {
       lift++;
       $('#lifts').append(`
         <div id="lift-${i}">
-          <label for="name-${i}">Lift ${lift}: </label><input type="text" name="name-${i}" id="name-${i}" value="${found.lifts[i].name}" class="large" required>
+          <label for="name-${i}" class="smallscreen">Lift ${lift}: </label><input type="text" name="name-${i}" id="name-${i}" value="${found.lifts[i].name}" class="large" required>
           <div class="smallscreen">
           <label for="weight-${i}" class="inline">Weight: </label>
             <input type="number" name="weight-${i}" id="weight-${i}" value="${found.lifts[i].weight}" class="medium" required>
@@ -365,7 +365,7 @@ function addLift() {
   lift++;
   $('#lifts').append(`
     <div id="lift-${lift - 1}">
-      <label for="name-${lift - 1}">Lift ${lift}: </label><input type="text" name="name-${lift - 1}" id="name-${lift - 1}" class="large" required>
+      <label for="name-${lift - 1}" class="smallscreen">Lift ${lift}: </label><input type="text" name="name-${lift - 1}" id="name-${lift - 1}" class="large" required>
       <div class="smallscreen">
       <label for="weight-${lift - 1}" class="inline">Weight: </label>
         <input type="number" name="weight-${lift - 1}" id="weight-${lift - 1}" class="medium" required>
@@ -482,9 +482,9 @@ function displayPage() {
     $('#login-and-signup').empty().removeClass('hidden').append(`
       <form id="login" onsubmit="event.preventDefault(); makeCreds();">
         <h3>Login</h3>
-        <label for="loginusername">Username</label><br/>
+        <label for="loginusername">Username</label>
         <input type="text" name="loginusername" id="loginusername" required><br/>
-        <label for="loginpassword">Password</label><br/>
+        <label for="loginpassword">Password</label>
         <input type="password" name="loginpassword" id="loginpassword" required><br/>
         <input type="submit" value="Login" id="js-login">
         <button type="button" onclick="guestLogin();">Login as guest</button>
@@ -493,11 +493,11 @@ function displayPage() {
       </form>
       <form id="signup" onsubmit="event.preventDefault(); signUp();">
         <h3>Sign Up</h3>
-        <label for="signupusername">Username</label><br/>
+        <label for="signupusername">Username</label>
         <input type="text" name="signupusername" id="signupusername" maxlength="16" required><br/>
-        <label for="signuppassword">Password</label><br/>
+        <label for="signuppassword">Password</label>
         <input type="password" name="signuppassword" id="signuppassword" minlength="8" maxlength="72" required><br/>
-        <label for="passconfirm">Re-enter your password</label><br/>
+        <label for="passconfirm">Re-enter your password</label>
         <input type="password" name="passconfirm" id="passconfirm" minlength="8" maxlength="72" required><br/>
         <input type="submit" value="Join" id="js-signup">
         <div id="signup-error">
