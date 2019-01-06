@@ -1,9 +1,8 @@
 'use strict';
 
 // Stuff I need to do:
-  // Password change input?? New endpoint??
   // login as guest button
-  // Organize by date/routine
+
 
 let lift = 0;
 let logs;
@@ -36,6 +35,14 @@ function refreshToken() {
       displayPage();
     })
     .catch(err => console.log(err));
+}
+
+function guestLogin() {
+  const guest = {
+    'username': 'guest',
+    'password': 'password'
+  };
+  logIn(guest);
 }
 
 function logIn(data) {
@@ -490,6 +497,7 @@ function displayPage() {
         <label for="loginusername">Username: </label><input type="text" name="loginusername" id="loginusername" required><br/>
         <label for="loginpassword">Password: </label><input type="password" name="loginpassword" id="loginpassword" required><br/>
         <input type="submit" value="Login" id="js-login">
+        <button type="button" onclick="guestLogin();">Login as guest</button>
       </form>
       <form id="signup" onsubmit="event.preventDefault(); signUp();">
         <legend>Sign Up!</legend>
