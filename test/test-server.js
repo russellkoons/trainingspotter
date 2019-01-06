@@ -526,7 +526,7 @@ describe('Auth Router', function() {
           expect(res.body).to.be.a('object');
           const token = res.body.authToken;
           expect(token).to.be.a('string');
-          const payload = jwt.verify(token, 'GOOD_NIGHT_AND_GOOD_RIDDANCE', {
+          const payload = jwt.verify(token, JWT_SECRET, {
             algorithm: ['HS256']
           });
           expect(payload.user).to.deep.equal({username});
@@ -575,7 +575,7 @@ describe('Auth Router', function() {
         {
          username
         },
-        'GOOD_NIGHT_AND_GOOD_RIDDANCE',
+        JWT_SECRET,
         {
           algorithm: 'HS256',
           expiresIn: Math.floor(Date.now() / 1000) - 10
@@ -609,7 +609,7 @@ describe('Auth Router', function() {
             expect(_res.body).to.be.a('object');
             const token = _res.body.authToken;
             expect(token).to.be.a('string');
-            const payload = jwt.verify(token, 'GOOD_NIGHT_AND_GOOD_RIDDANCE', {
+            const payload = jwt.verify(token, JWT_SECRET, {
               algorithm: ['HS256']
             });
             expect(payload.user).to.deep.equal({username});

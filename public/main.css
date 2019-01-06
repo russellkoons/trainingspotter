@@ -1,3 +1,68 @@
+html {
+  background: url(https://imgur.com/RVtH3et.jpg) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  font-family: sans-serif;
+}
+
+.center {
+  margin: 10px auto;
+  text-align: center;
+  max-width: 600px;
+  background-color: rgb(189, 186, 186);
+  padding: 10px;
+  border: 3px solid;
+  border-color: gray;
+}
+
+h1 {
+  color: red;
+}
+
+ol {
+  text-align: left;
+}
+
+li {
+  margin-left: -20px;
+}
+
+.alert {
+  color: red;
+}
+
+.form {
+  max-width: 600px;
+  background-color: rgb(189, 186, 186);
+  margin: 10px auto;
+  text-align: left;
+  padding: 10px;
+  border: 3px solid;
+  border-color: gray;
+}
+
+input[type=number] {
+  max-width: 40px;
+  margin-bottom: 3px;
+}
+
+.log {
+  background-color: rgb(189, 186, 186);
+  padding: 10px 20px 10px 20px;
+  margin: 10px auto;
+  border: 3px solid;
+  border-color: gray;
+}
+
+.flex-grid {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+}
+
 .hidden {
   display: none;
 }
