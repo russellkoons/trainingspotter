@@ -25,6 +25,10 @@ ol {
   text-align: left;
 }
 
+li {
+  margin-left: -20px;
+}
+
 .alert {
   color: red;
 }

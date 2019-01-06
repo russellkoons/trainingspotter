@@ -2,6 +2,8 @@
 
 // Stuff I need to do:
   // Password change input?? New endpoint??
+  // login as guest button
+  // Organize by date/routine
 
 let lift = 0;
 let logs;
