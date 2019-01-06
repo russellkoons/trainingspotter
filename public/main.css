@@ -5,6 +5,7 @@ html {
   -o-background-size: cover;
   background-size: cover;
   font-family: sans-serif;
+  font-size: 15px;
 }
 
 .box {
@@ -12,9 +13,9 @@ html {
   max-width: 600px;
   background-color: rgb(189, 186, 186);
   padding: 10px;
-  border: 2px solid;
-  border-color: gray;
-  opacity: 0.85;
+  border-radius: 10px;
+  opacity: 0.9;
+  text-align: center;
 }
 
 .center {
@@ -34,29 +35,97 @@ li {
   margin-bottom: 3px;
 }
 
-button {
-  display: inline;
-}
-
 .alert {
   color: red;
 }
 
 .form {
-  max-width: 600px;
-  background-color: rgb(189, 186, 186);
   margin: 10px auto;
-  text-align: left;
   padding: 10px;
-  border: 3px solid;
-  border-color: gray;
 }
 
-input[type=number] {
-  max-width: 40px;
-  margin-bottom: 3px;
+label {
+  display: block;
+}
+
+button, input, textarea, select {
+  border: 0px;
+  border-radius: 3px;
+  padding: 5px;
+  margin-bottom: 5px;
+}
+
+textarea {
+  width: 240px;
+  height: 60px;
+}
+
+input[type=date] {
+  width: 155.8px;
+}
+
+.inline {
+  display: inline;
+}
+
+.small {
+  width: 27px;
+}
+
+.medium {
+  width: 70px;
+}
+
+.large {
+  width: 200px;
 }
 
 .hidden {
   display: none;
+}
+
+@media only screen and (min-width: 360px) {
+  html {
+    font-size: 16px;
+  }
+
+  .small {
+    width: 47px;
+  }
+
+  .medium {
+    width: 80px;
+  }
+
+  .large {
+    width: 260px;
+  }
+}
+
+@media only screen and (min-width: 610px) {
+  textarea {
+    width: 480px;
+    height: 100px;
+  }
+
+  input[type=text] {
+    width: 155.8px;
+  }
+
+  input[type=number] {
+    width: 40px;
+  }
+
+  label {
+    display: inline;
+  }
+
+  .left {
+    margin-left: 140px;
+    margin-right: 100px;
+  }
+
+  .smallscreen {
+    display: inline;
+  }
 }

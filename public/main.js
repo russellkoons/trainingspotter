@@ -129,15 +129,15 @@ function submitEdit(id, routine) {
     'id': id,
     'routine': routine,
     'lifts': [],
-    'notes': $(`.notes`).val()
+    'notes': $(`#notes`).val()
   };
   for (let i = 0; i < lift; i++) {
     newLog.lifts.push({
-      'name': $(`.name-${i}`).val(),
-      'weight': $(`.weight-${i}`).val(),
-      'unit': $(`.unit-${i}`).val(),
-      'sets': $(`.set-${i}`).val(),
-      'reps': $(`.rep-${i}`).val()
+      'name': $(`#name-${i}`).val(),
+      'weight': $(`#weight-${i}`).val(),
+      'unit': $(`#unit-${i}`).val(),
+      'sets': $(`#set-${i}`).val(),
+      'reps': $(`#rep-${i}`).val()
     });
   };
   fetch(`/logs/${id}`, {
@@ -156,40 +156,45 @@ function submitEdit(id, routine) {
 
 function editForm(num) {
   displayWorkouts(logs);
-  $(`#log-${num}`).empty();
+  $('#form').empty().addClass('hidden');
+  $('#log-form').addClass('hidden');
   const found = logs[num];
-  $(`#log-${num}`).append(`
-    <p>${found.date}</p>
-    <p>Routine: ${found.routine}</p>
-    <form id="edit-${num}" onsubmit="event.preventDefault(); submitEdit('${found.id}', '${found.routine}');">
+  $(`#log-${num}`).empty().append(`
+    <p class="center">${found.date}</p>
+    <p class="center">Routine: ${found.routine}</p>
+    <form id="edit-${num}" onsubmit="event.preventDefault(); submitEdit('${found.id}', '${found.routine}');" class="form">
       <section id="lifts">
       </section>
-      <label for="notes">Notes: </label><input type="text" name="notes" class="notes" value="${found.notes}"><br/>
+      <button type="button" onclick="addLift();">Add lift</button>
+      <button type="button" onclick="removeLift();">Remove lift</button><br/>
+      <label for="notes">Notes</label><br/>
+      <textarea type="text" name="notes" id="notes">${found.notes}</textarea><br/>
       <input type="submit">
+      <button type="button" onclick="displayWorkouts(logs);">Cancel</button>
     </form>
-    <button type="button" onclick="addLift();">Add lift</button>
-    <button type="button" onclick="removeLift();">Remove lift</button>
-    <button type="button" onclick="displayWorkouts(logs);">Cancel</button>
   `);
   for (let i = found.lifts.length - 1; i >= 0; i--) {
     lift++;
     $(`#lifts`).prepend(`
       <div id="lift-${i}">
-        <label for="name-${i}">Lift ${i + 1}: </label><input type="text" name="name-${i}" class="name-${i}" value="${found.lifts[i].name}">
-        <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" class="weight-${i}" value="${found.lifts[i].weight}">
-        <select class="unit-${i}">
-        </select>
-        <label for="set-${i}">Sets: </label><input type="number" name="set-${i}" class="set-${i}" value="${found.lifts[i].sets}" required>
-        <label for="rep-${i}">Reps: </label><input type="number" name="rep-${i}" class="rep-${i}" value="${found.lifts[i].reps}" required><br/>
+        <label for="name-${i}">Lift ${i + 1}: </label><input type="text" name="name-${i}" id="name-${i}" class="large" value="${found.lifts[i].name}">
+        <div class="smallscreen">
+        <label for="weight-${i}" class="inline">Weight: </label>
+          <input type="number" name="weight-${i}" id="weight-${i}" class="medium" value="${found.lifts[i].weight}">
+          <select id="unit-${i}">
+          </select>
+        </div>
+        <label for="set-${i}" class="inline">Sets: </label><input type="number" name="set-${i}" id="set-${i}" value="${found.lifts[i].sets}" class="small" required>
+        <label for="rep-${i}" class="inline">Reps: </label><input type="number" name="rep-${i}" id="rep-${i}" value="${found.lifts[i].reps}" class="small" required>
       </div>
     `);
     if (found.lifts[i].unit === 'lbs') {
-      $(`.unit-${i}`).append(`
+      $(`#unit-${i}`).append(`
         <option value="lbs">lbs</option>
         <option value="kgs">kgs</option>
       `);
     } else {
-      $(`.unit-${i}`).append(`
+      $(`#unit-${i}`).append(`
         <option value="kgs">kgs</option>
         <option value="lbs">lbs</option>
       `);
@@ -271,61 +276,69 @@ function clearForm() {
 }
 
 function createForm() {
-  $('#form').empty();
   lift = 0;
   const routine = $('#routine-list').val();
   if (routine === 'new') {
     lift++;
     $('#log-form').removeClass('hidden');
-    $('#form').empty();
-    $('#form').append(`
+    $('#form').empty().removeClass('hidden').append(`
       <form id="new-routine" onsubmit="event.preventDefault(); createRoutine();">
+        <label for="routine" class="formlabel">Routine Name: </label><input type="text" name="routine" id="routine-name" required><br/>
         <section id="lifts">
           <div id="lift-0">
-            <label for="routine">Routine Name: </label><input type="text" name="routine" id="routine-name" required><br/>
-            <label for="name-0">Lift 1: <input type="text" name="name-0" id="name-0" required>
-            <label for="weight-0">Weight: <input type="number" name="weight-0" id="weight-0" required>
-            <select id="unit-0">
-              <option value="kgs">kgs</option>
-              <option value="lbs">lbs</option>
-            </select>
-            <label for="set-0">Sets: <input type="number" name="set-0" id="set-0" required>
-            <label for="rep-0">Reps: <input type="number" name="rep-0" id="rep-0" required><br/>
+            <label for="name-0">Lift 1: </label><input type="text" name="name-0" id="name-0" class="large" required>
+            <div class="smallscreen">
+            <label for="weight-0" class="inline">Weight: </label>
+              <input type="number" name="weight-0" id="weight-0" class="medium" required>
+              <select id="unit-0">
+                <option value="kgs">kgs</option>
+                <option value="lbs">lbs</option>
+              </select>
+            </div>
+            <label for="set-0" class="inline">Sets: </label><input type="number" name="set-0" id="set-0" class="small" required>
+            <label for="rep-0" class="inline">Reps: </label><input type="number" name="rep-0" id="rep-0" class="small" required>
           </div>
         </section>
         <section id="notes-n-submit">
-          <label for="notes">Notes: </label><input type="text" name="notes" id="notes"><br/>
+          <button type="button" onclick="addLift();" class="center">Add lift</button>
+          <button type="button" onclick="removeLift();" class="center">Remove lift</button><br/>
+          <label for="notes">Notes</label><br/><textarea type="text" name="notes" id="notes"></textarea><br/>
           <label for="date">Date: </label><input type="date" name="date" id="date"><br/>
           <input type="submit" value="Submit" id="js-routine-submit">
+          <button type="button" onclick="clearForm();">Cancel</button>
         </section>
       </form>
-      <button type="button" onclick="addLift();">Add lift</button>
-      <button type="button" onclick="removeLift();">Remove lift</button>
-      <button type="button" onclick="clearForm();">Cancel</button>
     `);
   } else {
     const found = logs.slice().reverse().find(function(workout) {
       return workout.routine === routine;
     });
-    $('#form').append(`
-      <form id="new-workout" onsubmit="event.preventDefault(); createLog(lift);">
-      <section id="lifts">
-      </section>
+    $('#form').empty().removeClass('hidden').append(`
+      <form id="new-workout" onsubmit="event.preventDefault(); createLog();">
+        <section id="lifts">
+        </section>
+        <button type="button" onclick="addLift();">Add lift</button>
+        <button type="button" onclick="removeLift();">Remove lift</button><br/>
+        <label for="notes">Notes</label><br/>
+        <textarea type="text" name="notes" id="notes"></textarea><br/>
+        <label for="date">Date: </label><input type="date" name="date" id="date" required><br/>
+        <input type="submit">
+        <button type="text" onclick="clearForm();">Cancel</button>
       </form>
-      <button type="button" onclick="addLift();">Add lift</button>
-      <button type="button" onclick="removeLift();">Remove lift</button>
-      <button type="text" onclick="clearForm();">Cancel</button>
     `);
     for (let i = 0; i < found.lifts.length; i++) {
       lift++;
       $('#lifts').append(`
         <div id="lift-${i}">
-          <label for="name-${i}">Lift ${lift}: </label><input type="text" name="name-${i}" id="name-${i}" value="${found.lifts[i].name}" required>
-          <label for="weight-${i}">Weight: </label><input type="number" name="weight-${i}" id="weight-${i}" value="${found.lifts[i].weight}" required>
-          <select id="unit-${i}">
-          </select>
-          <label for="set-${i}">Sets: </label><input type="number" name="set-${i}" id="set-${i}" value="${found.lifts[i].sets}" required>
-          <label for="rep-${i}">Reps: </label><input type="number" name="rep-${i}" id="rep-${i}" value="${found.lifts[i].reps}" required><br/>
+          <label for="name-${i}">Lift ${lift}: </label><input type="text" name="name-${i}" id="name-${i}" value="${found.lifts[i].name}" class="large" required>
+          <div class="smallscreen">
+          <label for="weight-${i}" class="inline">Weight: </label>
+            <input type="number" name="weight-${i}" id="weight-${i}" value="${found.lifts[i].weight}" class="medium" required>
+            <select id="unit-${i}">
+            </select>
+          </div>
+          <label for="set-${i}" class="inline">Sets: </label><input type="number" name="set-${i}" id="set-${i}" class="small" value="${found.lifts[i].sets}" required>
+          <label for="rep-${i}" class="inline">Reps: </label><input type="number" name="rep-${i}" id="rep-${i}" class="small" value="${found.lifts[i].reps}" required>
         </div>
       `);
       if (found.lifts[i].unit === 'lbs') {
@@ -340,11 +353,6 @@ function createForm() {
         `)
       };
     };
-    $('#new-workout').append(`
-    <label for="notes">Notes: </label><input type="text" name="notes" id="notes"><br/>
-    <label for="date">Date: </label><input type="date" name="date" id="date" required><br/>
-    <input type="submit">
-    `);
   }
 }
 
@@ -357,14 +365,17 @@ function addLift() {
   lift++;
   $('#lifts').append(`
     <div id="lift-${lift - 1}">
-      <label for="name-${lift - 1}">Lift ${lift}: <input type="text" name="name-${lift - 1}" id="name-${lift - 1}" required>
-      <label for="weight-${lift - 1}">Weight: <input type="number" name="weight-${lift - 1}" id="weight-${lift - 1}" required>
-      <select id="unit-${lift - 1}">
-      <option value="kgs">kgs</option>
-      <option value="lbs">lbs</option>
-      </select>
-      <label for="set-${lift - 1}">Sets: <input type="number" name="set-${lift - 1}" id="set-${lift - 1}" required>
-      <label for="rep-${lift - 1}">Reps: <input type="number" name="rep-${lift - 1}" id="rep-${lift - 1}" required><br/>
+      <label for="name-${lift - 1}">Lift ${lift}: </label><input type="text" name="name-${lift - 1}" id="name-${lift - 1}" class="large" required>
+      <div class="smallscreen">
+      <label for="weight-${lift - 1}" class="inline">Weight: </label>
+        <input type="number" name="weight-${lift - 1}" id="weight-${lift - 1}" class="medium" required>
+        <select id="unit-${lift - 1}">
+          <option value="kgs">kgs</option>
+          <option value="lbs">lbs</option>
+        </select>
+      </div>
+      <label for="set-${lift - 1}" class="inline">Sets: </label><input type="number" name="set-${lift - 1}" id="set-${lift - 1}" class="small" required>
+      <label for="rep-${lift - 1}" class="inline">Reps: </label><input type="number" name="rep-${lift - 1}" id="rep-${lift - 1}" class="small" required>
     </div>
   `);
 }
@@ -404,7 +415,7 @@ function displayWorkouts(data) {
         <li>Fill out the form to create a new routine</li>
         <li>Click "Add lift" to put more lifts into your routine</li>
         <li>Once your form is filled out click submit and it will be saved to the database</li>
-        <li>Next time you do that workout just pick it from the list and it'll pop up already filled out. You just need to make any adjustment for gains or changes in your workout</li>
+        <li>Next time you do that workout, pick it from the list and it'll pop up already filled out. You just need to make any adjustment for gains or changes in your workout</li>
       </ol>
       <p>You're ready to get started! Thanks for using trainingspotter!</p>  
     `)
@@ -415,8 +426,8 @@ function displayWorkouts(data) {
     $('#log-buttons').removeClass('hidden');
     for (let i = 0; i < data.length; i++) {
       $('#workout-list').prepend(`
-        <section id="log-${i}" class="box">
-          <p class="center">${data[i].date}</p>
+        <section id="log-${i}" class="box center">
+          <h4 class="center">${data[i].date}</h4>
           <p class="left">Routine: ${data[i].routine}</p> 
           <ol id="workout-${i}" class="left"></ol> 
           <p class="left">Notes: ${data[i].notes}</p>
@@ -470,19 +481,24 @@ function displayPage() {
     $('#user-signout').empty();
     $('#login-and-signup').empty().removeClass('hidden').append(`
       <form id="login" onsubmit="event.preventDefault(); makeCreds();">
-        <legend>Login!</legend>
-        <label for="loginusername">Username: </label><input type="text" name="loginusername" id="loginusername" required><br/>
-        <label for="loginpassword">Password: </label><input type="password" name="loginpassword" id="loginpassword" required><br/>
+        <h3>Login</h3>
+        <label for="loginusername">Username</label><br/>
+        <input type="text" name="loginusername" id="loginusername" required><br/>
+        <label for="loginpassword">Password</label><br/>
+        <input type="password" name="loginpassword" id="loginpassword" required><br/>
         <input type="submit" value="Login" id="js-login">
         <button type="button" onclick="guestLogin();">Login as guest</button>
         <div id="login-error">
         </div>
       </form>
       <form id="signup" onsubmit="event.preventDefault(); signUp();">
-        <legend>Sign Up!</legend>
-        <label for="signupusername">Username: </label><input type="text" name="signupusername" id="signupusername" maxlength="16" required><br/>
-        <label for="signuppassword">Password: </label><input type="password" name="signuppassword" id="signuppassword" minlength="8" maxlength="72" required><br/>
-        <label for="passconfirm">Re-enter your password: </label><input type="password" name="passconfirm" id="passconfirm" minlength="8" maxlength="72" required><br/>
+        <h3>Sign Up</h3>
+        <label for="signupusername">Username</label><br/>
+        <input type="text" name="signupusername" id="signupusername" maxlength="16" required><br/>
+        <label for="signuppassword">Password</label><br/>
+        <input type="password" name="signuppassword" id="signuppassword" minlength="8" maxlength="72" required><br/>
+        <label for="passconfirm">Re-enter your password</label><br/>
+        <input type="password" name="passconfirm" id="passconfirm" minlength="8" maxlength="72" required><br/>
         <input type="submit" value="Join" id="js-signup">
         <div id="signup-error">
         </div>
