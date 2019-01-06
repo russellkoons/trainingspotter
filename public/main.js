@@ -1,5 +1,9 @@
 'use strict';
 
+// I start out creating some global variables. The important ones are lift and logs. Lift is used throughout the code in order to keep track
+// of how many exercises need to be included in the JSON object when everything is sent to the API. Logs is used to store the response
+// from the API so they can be displayed on the page at anytime
+
 let lift = 0;
 let logs;
 let token;
@@ -9,6 +13,8 @@ function signOut() {
   localStorage.removeItem('authToken');
   displayPage();
 }
+
+// Refresh is only called when a user is a day away from their JWT expiring
 
 function refreshToken() {
   fetch('/auth/refresh', {
@@ -32,6 +38,8 @@ function refreshToken() {
     })
     .catch(err => console.log(err));
 }
+
+// The next four functions are all used to make the login call to the API in order to get the JWT or make a new user
 
 function guestLogin() {
   const guest = {
@@ -112,6 +120,9 @@ function makeCreds() {
   logIn(creds);
 }
 
+// Here's where we get into the meat of the app. The app is essentially a weightlifting diary so most of what it does it make logs of
+// your weightlifting routines and sends them to the API for safekeeping
+
 function deleteLog(num) {
   const id = logs[num].id;
   fetch(`/logs/${id}`, {
@@ -153,6 +164,9 @@ function submitEdit(id, routine) {
     });
   getWorkouts();
 }
+
+// This function specifically makes a form for the PUT endpoint of the API. If you look in the client it creates the form in the actual 
+// workout list as opposed to the specific form section in the HTML.
 
 function editForm(num) {
   displayWorkouts(logs);
@@ -202,13 +216,14 @@ function editForm(num) {
   };
 }
 
+// These next two functions create the JSON object to send to the POST endpoint. A new routine and a saved routine get made in almost the same
+// way except that the routine name is taken from a slightly different place, hence why I made two functions
+
 function createRoutine() {
   const newLog = {
     'routine': $('#routine-name').val(),
     'user': user,
-    'lifts': [
-
-    ],
+    'lifts': [],
     'notes': $('#notes').val(),
     'date': $('#date').val()
   };
@@ -267,6 +282,10 @@ function addWorkout(data) {
   clearForm();
   getWorkouts();
 }
+
+// These next two work with the log-form in the HTML. One is a simple clear function but the builds the form from scratch. If the user is
+// is making a log with a routine they've already saved before the form will appear with all the info filled out so they don't have to
+// retype everything. It is very handy when I'm lifting weights and I only have to update the values I make gains in.
 
 function clearForm() {
   lift = 0;
@@ -356,6 +375,10 @@ function createForm() {
   }
 }
 
+// All of the forms include 'Add lift' and 'Remove lift' buttons which call these functions. In order to make the logs as customizable
+// as possible I figured the user would need to be able to add or remove lifts as they wanted. My routines are pretty set in stone
+// but I know other weightlifters like to switch up their routines.
+
 function removeLift() {
   lift--;
   $(`#lift-${lift}`).remove();
@@ -380,6 +403,9 @@ function addLift() {
   `);
 }
 
+// This is called when the 'Add new workout' button is clicked. It creates a select element and fills it with the names of the routines
+// that the user has previously created.
+
 function newWorkout() {
   $('#js-new-log').click(event => {
     $('#log-form').removeClass('hidden');
@@ -402,6 +428,11 @@ function newWorkout() {
     };
   });
 }
+
+// The next two GET and display the logs from the API. Once the workouts have been received from the API, the function finds the logs
+// that match the user name that's been saved in the user variable and then sorts them by date. Since the API saves the logs in the order
+// that they're sent sorting them by date allows the user to log workouts from anytime at all and the logs will stay in order. If the user
+// has no logs saved in the API then displayWorkouts gives them a list of instructions on how to use the app.
 
 function displayWorkouts(data) {
   if (data.length === 0) {
@@ -470,6 +501,11 @@ function parseJwt(token) {
   var base64 = base64Url.replace('-', '+').replace('_', '/');
   return JSON.parse(window.atob(base64));
 };
+
+// Finally this is the function that starts the page. Users without a JWT in localStorage are given the login screen. Users with a JWT
+// have their JWT parsed in order to check if it's still good or almost expired. If it's expired they get thrown back to the login.
+// If there's less than a day before it expires then it refreshes the token. Otherwise it sets the user and token globals and makes a
+// GET call to the API
 
 function displayPage() {
   token = localStorage.getItem('authToken');
