@@ -78,10 +78,10 @@ router.put('/:id', (req, res) => {
   };
   Log
     .findByIdAndUpdate(req.params.id, { $set: updated }, { new: true })
-    .then(updatedLog => {
+    .then(() => {
       res.status(204).end()
     })
-    .catch(err => res.status(500).json({ message: `Failed to update log ${req.params.id}` }));
+    .catch(() => res.status(500).json({ message: `Failed to update log ${req.params.id}` }));
 });
 
 router.delete('/:id', (req, res) => {
@@ -89,7 +89,7 @@ router.delete('/:id', (req, res) => {
     .findByIdAndRemove(req.params.id)
     .then(() => {
       console.log(`Deleting log ${req.params.id}`);
-      res.status(204).json({ message: 'Successful delete'});
+      res.status(204).json({ message: 'Successful delete' });
     })
     .catch(err => {
       console.log(err);

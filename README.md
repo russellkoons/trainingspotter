@@ -1,6 +1,4 @@
-trainingspotter
-
-https://trainingspotter.herokuapp.com
+# trainingspotter
 
 ![trainingspotter](https://i.imgur.com/SfxUkfw.png)
 
@@ -8,4 +6,24 @@ trainingspotter is an app to create an easy to use weightlifting journal. I was 
 
 trainingspotter lets you build specific routines and gives you already filled in forms the next time you do that routine. If you're repeating a routine and not changing any of the weight then you can make a new entry in just a few clicks!
 
-Made with HTML, CSS, JavaScript, Node.js
+## Live App
+- Checkout the live app - [trainingspotter](https://trainingspotter.herokuapp.com)
+
+## Built with...
+### Front-End
+  - HTML
+  - CSS
+  - JavaScript
+  - jQuery
+
+### Back-End
+  - Node.js
+  - Express
+  - mongoDB
+
+### Testing
+  - Mocha
+  - Chai
+
+### Authentication
+  - JSON Web Token
