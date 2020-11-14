@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 mongoose.set('useFindAndModify', false);
 
 const{ router: usersRouter } = require('./users');
-const{ router: logRouter} = require('./logs');
+const{ router: logRouter } = require('./logs');
 const{ router: authRouter, local, jwt } = require('./auth')
 
 mongoose.Promise = global.Promise;
