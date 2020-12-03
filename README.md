@@ -7,7 +7,7 @@ trainingspotter is an app to create an easy to use weightlifting journal. I was 
 trainingspotter lets you build specific routines and gives you already filled in forms the next time you do that routine. If you're repeating a routine and not changing any of the weight then you can make a new entry in just a few clicks!
 
 ## Live App
-- Checkout the live app - [trainingspotter](https://trainingspotter.herokuapp.com)
+- [trainingspotter](https://trainingspotter.herokuapp.com)
 
 ## Built with...
 ### Front-End
