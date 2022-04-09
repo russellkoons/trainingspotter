@@ -15,7 +15,7 @@
     "faker": "^4.1.0",
     "jsonwebtoken": "^8.4.0",
     "minimist": "^1.2.5",
-    "moment": "^2.27.0",
+    "moment": "^2.29.2",
     "mongodb": "^3.6.1",
     "mongoose": "^5.10.2",
     "morgan": "^1.10.0",
